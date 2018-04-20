@@ -4,8 +4,8 @@ rm(list=ls())
 library(tidyverse)
 library(metafor)
 
-source("C:/Users/andre/Documents/HBGDki/Scripts/Figure and Table Scripts/HBGDki_plotting_functions.R")
-source("C:/Users/andre/Documents/HBGDki/Scripts/Figure and Table Scripts/Meta-analysis functions.R")
+source("C:/Users/andre/Documents/HBGDki/Wasting/4) Results plotting/HBGDki_plotting_functions.R")
+source("C:/Users/andre/Documents/HBGDki/Wasting/4) Results plotting/Meta-analysis functions.R")
 
 
 setwd("C:/Users/andre/Documents/HBGDki/Results")

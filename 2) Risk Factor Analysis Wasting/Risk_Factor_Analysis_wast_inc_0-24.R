@@ -48,7 +48,6 @@ HAZ_unadj <- stunt_unadj <- HAZ_adj <- stunt_adj <- list()
 
 #set superlearner libraries
 unadjusted_lib <- "SL.glm"
-#adjusted_lib <- c("SL.mean","SL.glm","SL.glmnet")
 adjusted_lib <- c("SL.mean","SL.glm")
 
 
