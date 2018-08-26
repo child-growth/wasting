@@ -35,7 +35,7 @@ drop_missing <- function(df, variable){
 #----------------------------------
 
 
-load("U:/data/Compiled Datasets/WastInc0-24.Rdata")
+load("U:/data/Compiled Datasets/WastInc0-24_noBW.Rdata")
 mean(d$wast_inc)
 
 #subset intervention studies to the control arm
@@ -302,7 +302,7 @@ for(i in 1:length(continious_vars)){
 
 
 save(wastinc_024_unadj, wastinc_024_adj, 
-     file="U:/results/Risk_Factor_Results_wastinc0-24.Rdata")
+     file="U:/results/Risk_Factor_Results_wastinc0-24_noBW.Rdata")
 
 
 
