@@ -30,47 +30,47 @@ d = d %>%
 
 d <- d %>% ungroup() %>% arrange(studyid,country,subjid, agedays) %>% 
   group_by(studyid,country,subjid) %>% 
-  mutate(stunt= as.numeric(whz < -2), numstunt=cumsum(stunt)) %>%
+  mutate(wast= as.numeric(whz < -2), numwast=cumsum(wast)) %>%
   group_by(studyid,country,subjid, agecat) %>% 
-  mutate(minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  mutate(minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
   ungroup() 
 
 
 #calculate any Wasting from 0-6
-stunt_ci_0_6 = d %>% ungroup() %>%
+wast_ci_0_6 = d %>% ungroup() %>%
   filter(agecat=="6 months") %>%
   group_by(studyid,country,subjid) %>%
-  mutate(agecat="0-6 months", minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
-  ungroup() %>% subset(., select=-c(stunt, numstunt))
+  mutate(agecat="0-6 months", minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  ungroup() %>% subset(., select=-c(wast, numwast))
 
-#If the child was stunted at the start of the cumulative incidence age range, the child is not in the risk set and for 
-#stunted and there cannot be an incident of Wasting unless the child recovers and then drops back below -2 during the age 
+#If the child was wasted at the start of the cumulative incidence age range, the child is not in the risk set and for 
+#wasted and there cannot be an incident of Wasting unless the child recovers and then drops back below -2 during the age 
 #range.
 
 #calculate any Wasting from 6-24
-stunt_ci_6_24 = d %>% ungroup() %>% 
+wast_ci_6_24 = d %>% ungroup() %>% 
   arrange(studyid,country,subjid, agedays) %>% 
   filter(agecat!="6 months" & !is.na(agecat)) %>%
   group_by(studyid,country,subjid) %>%
-  #mark if children started stunted. They need to recover to be included in the at-risk pool
-  mutate(start_stunt= as.numeric(first(whz) < -2), cumsum_notwasted=cumsum(as.numeric(whz >= -2)), anyrecovery=max(cumsum_notwasted)>0) %>%
-  filter((anyrecovery & cumsum_notwasted!=0) | start_stunt==0) %>% #drop children never at risk (start stunted and never recovered) and drop obs prior to recovery
-  mutate(agecat="6-24 months", minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  #mark if children started wasted. They need to recover to be included in the at-risk pool
+  mutate(start_wast= as.numeric(first(whz) < -2), cumsum_notwasted=cumsum(as.numeric(whz >= -2)), anyrecovery=max(cumsum_notwasted)>0) %>%
+  filter((anyrecovery & cumsum_notwasted!=0) | start_wast==0) %>% #drop children never at risk (start wasted and never recovered) and drop obs prior to recovery
+  mutate(agecat="6-24 months", minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
   ungroup() %>%
-  select(studyid,subjid, country,tr,agedays,whz, measurefreq, measid, agecat,minwhz, ever_stunted,N)
+  select(studyid,subjid, country,tr,agedays,whz, measurefreq, measid, agecat,minwhz, ever_wasted,N)
 
 #calculate any Wasting from 0-24
-stunt_ci_0_24 = d %>% ungroup() %>%
+wast_ci_0_24 = d %>% ungroup() %>%
   filter(!is.na(agecat)) %>%
   group_by(studyid,country,subjid) %>%
-  mutate(agecat="0-24 months", minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
-  ungroup()  %>% subset(., select=-c(stunt, numstunt))
+  mutate(agecat="0-24 months", minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  ungroup()  %>% subset(., select=-c(wast, numwast))
 
 
-cuminc <- rbind(stunt_ci_0_6, stunt_ci_6_24, stunt_ci_0_24)
+cuminc <- rbind(wast_ci_0_6, wast_ci_6_24, wast_ci_0_24)
 
 table(cuminc$agecat)
-table(cuminc$agecat, cuminc$ever_stunted)
+table(cuminc$agecat, cuminc$ever_wasted)
 
 #--------------------------------------
 # Calculate prevalence of
@@ -97,14 +97,14 @@ dmn <- d %>%
   filter(!is.na(agecat)) %>%
   group_by(studyid,country,subjid,agecat) %>%
   summarise(whz=mean(whz)) %>%
-  mutate(stunted=ifelse(whz< -2, 1,0),sstunted=ifelse(whz< -3, 1,0))
+  mutate(wasted=ifelse(whz< -2, 1,0),swasted=ifelse(whz< -3, 1,0))
 
 
 # export
 prev = dmn %>% 
   filter(agecat=="Birth" | agecat=="6 months" | agecat=="24 months")
 select(studyid,subjid,country,agecat,
-       stunted, sstunted)
+       wasted, swasted)
 
 
 
@@ -143,19 +143,19 @@ d %>%
             mean=mean(agedays/30.4167,na.rm=TRUE),
             max=max(agedays/30.4167))
 
-# subset to stunted between birth and 3 months
-stunt.03 <- d %>%
+# subset to wasted between birth and 3 months
+wast.03 <- d %>%
   filter(agecat=="Birth" | agecat=="3 months") %>%
   group_by(studyid,country,subjid) %>%
   mutate(measid=seq_along(subjid))  %>%
-  mutate(stunted=ifelse(whz< -2,1,0),
-         lagstunted=lag(stunted),
-         leadstunted=lead(stunted))  %>%
+  mutate(wasted=ifelse(whz< -2,1,0),
+         lagwasted=lag(wasted),
+         leadwasted=lead(wasted))  %>%
   # unique Wasting episode
-  mutate(sepisode=ifelse(lagstunted==0 & stunted==1 & leadstunted==1 |
-                           stunted==1 & measid==1,1,0)) %>%
+  mutate(sepisode=ifelse(lagwasted==0 & wasted==1 & leadwasted==1 |
+                           wasted==1 & measid==1,1,0)) %>%
   # identify whether child had Wasting episode between 0 and 3 months 
-  summarise(stunted03=max(sepisode,na.rm=TRUE))
+  summarise(wasted03=max(sepisode,na.rm=TRUE))
 
 rec.24 <- d %>%
   filter(agecat=="24 months") %>%
@@ -163,7 +163,7 @@ rec.24 <- d %>%
   group_by(studyid,country,subjid) %>%
   mutate(rank=min_rank(-agedays)) %>%
   filter(rank<= 2) %>%
-  # flag kids with 2 measurements not stunted
+  # flag kids with 2 measurements not wasted
   mutate(rec=ifelse(whz>= -2,1,0)) %>%
   mutate(recsum=cumsum(rec)) %>%
   # one row for each kid, indicator for recovered
@@ -171,8 +171,8 @@ rec.24 <- d %>%
   mutate(rec24=ifelse(maxrec==2,1,0)) %>%
   select(-c(maxrec))
 
-rev <- full_join(stunt.03, rec.24,by=c("studyid","country","subjid")) %>%
-  mutate(s03rec24=ifelse(stunted03==1 & rec24==1,1,0)) %>%
+rev <- full_join(wast.03, rec.24,by=c("studyid","country","subjid")) %>%
+  mutate(s03rec24=ifelse(wasted03==1 & rec24==1,1,0)) %>%
   select(studyid, country,subjid, s03rec24)
 
 # prepare data for pooling 
@@ -200,9 +200,9 @@ sum(rev.data$N)
 #--------------------------------------
 
 
-save(cuminc, file="U:/ucb-superlearner/Wasting rallies/st_prev.RData")
-save(prev, file="U:/ucb-superlearner/Wasting rallies/st_cuminc.rdata")
-save(rev, file="U:/ucb-superlearner/Wasting rallies/st_rec.RData")
+save(cuminc, file="U:/ucb-superlearner/Wasting rallies/wast_prev.RData")
+save(prev, file="U:/ucb-superlearner/Wasting rallies/wast_cuminc.rdata")
+save(rev, file="U:/ucb-superlearner/Wasting rallies/wast_rec.RData")
 
 #-----------------------------------
 # Wasting Outcomes - Risk factor analysis
@@ -225,37 +225,37 @@ load("U:/Data/Wasting/rf_Wasting_data.RData")
 
 
 #calculate any Wasting from 0-6
-stunt_ci_0_6 = d %>% ungroup() %>%
+wast_ci_0_6 = d %>% ungroup() %>%
   filter(agecat=="6 months") %>%
   group_by(studyid,country,subjid) %>%
   #create variable with minwhz by age category, cumulatively
-  mutate(agecat="0-6 months", minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  mutate(agecat="0-6 months", minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
   ungroup() 
 
 #calculate any Wasting from 6-24
-stunt_ci_6_24 = d %>% ungroup() %>% 
+wast_ci_6_24 = d %>% ungroup() %>% 
   arrange(studyid,country,subjid, agedays) %>% 
   filter(agecat!="6 months" & !is.na(agecat)) %>%
   group_by(studyid,country,subjid) %>%
-  #mark if children started stunted. They need to recover to be included in the at-risk pool
-  mutate(start_stunt= as.numeric(first(whz) < -2), cumsum_notwasted=cumsum(as.numeric(whz >= -2)), anyrecovery=max(cumsum_notwasted)>0) %>%
-  filter((anyrecovery & cumsum_notwasted!=0 & start_stunt==1) | start_stunt==0) %>% #drop children never at risk (start stunted and never recovered) and drop obs prior to recovery
-  mutate(agecat="6-24 months", minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  #mark if children started wasted. They need to recover to be included in the at-risk pool
+  mutate(start_wast= as.numeric(first(whz) < -2), cumsum_notwasted=cumsum(as.numeric(whz >= -2)), anyrecovery=max(cumsum_notwasted)>0) %>%
+  filter((anyrecovery & cumsum_notwasted!=0 & start_wast==1) | start_wast==0) %>% #drop children never at risk (start wasted and never recovered) and drop obs prior to recovery
+  mutate(agecat="6-24 months", minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
   ungroup() %>%
-  select(studyid,subjid, country,tr,agedays,whz, measurefreq, measid, agecat,minwhz, ever_stunted,N)
+  select(studyid,subjid, country,tr,agedays,whz, measurefreq, measid, agecat,minwhz, ever_wasted,N)
 
 #calculate any Wasting from 0-24
-stunt_ci_0_24 = d %>% ungroup() %>%
+wast_ci_0_24 = d %>% ungroup() %>%
   filter(agecat!="6 months" & !is.na(agecat)) %>%
   group_by(studyid,country,subjid) %>%
   #create variable with minwhz by age category, cumulatively
-  mutate(agecat="0-24 months", minwhz=min(whz), ever_stunted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
+  mutate(agecat="0-24 months", minwhz=min(whz), ever_wasted=ifelse(minwhz< -2,1,0), N=n()) %>% slice(1) %>%
   ungroup() 
 
-stunt_ci_0_6 <- stunt_ci_0_6 %>% subset(., select = -c(stunt, numstunt))
-stunt_ci_0_24 <- stunt_ci_0_24 %>% subset(., select = -c(stunt, numstunt))
+wast_ci_0_6 <- wast_ci_0_6 %>% subset(., select = -c(wast, numwast))
+wast_ci_0_24 <- wast_ci_0_24 %>% subset(., select = -c(wast, numwast))
 
-cuminc <- rbind(stunt_ci_0_6, stunt_ci_6_24, stunt_ci_0_24)
+cuminc <- rbind(wast_ci_0_6, wast_ci_6_24, wast_ci_0_24)
 
 
 #--------------------------------------
@@ -283,14 +283,14 @@ dmn <- d %>%
   filter(!is.na(agecat)) %>%
   group_by(studyid,country,subjid,agecat) %>%
   summarise(whz=mean(whz)) %>%
-  mutate(stunted=ifelse(whz< -2, 1,0),sstunted=ifelse(whz< -3, 1,0))
+  mutate(wasted=ifelse(whz< -2, 1,0),swasted=ifelse(whz< -3, 1,0))
 
 
 # export
 prev = dmn %>% 
   filter(agecat=="Birth" | agecat=="6 months" | agecat=="24 months") %>%
 select(studyid,subjid,country,agecat,
-       stunted, sstunted)
+       wasted, swasted)
 
 
 
@@ -329,19 +329,19 @@ d %>%
             mean=mean(agedays/30.4167,na.rm=TRUE),
             max=max(agedays/30.4167))
 
-# subset to stunted between birth and 3 months
-stunt.03 <- d %>%
+# subset to wasted between birth and 3 months
+wast.03 <- d %>%
   filter(agecat=="Birth" | agecat=="3 months") %>%
   group_by(studyid,country,subjid) %>%
   mutate(measid=seq_along(subjid))  %>%
-  mutate(stunted=ifelse(whz< -2,1,0),
-         lagstunted=lag(stunted),
-         leadstunted=lead(stunted))  %>%
+  mutate(wasted=ifelse(whz< -2,1,0),
+         lagwasted=lag(wasted),
+         leadwasted=lead(wasted))  %>%
   # unique Wasting episode
-  mutate(sepisode=ifelse(lagstunted==0 & stunted==1 & leadstunted==1 |
-                           stunted==1 & measid==1,1,0)) %>%
+  mutate(sepisode=ifelse(lagwasted==0 & wasted==1 & leadwasted==1 |
+                           wasted==1 & measid==1,1,0)) %>%
   # identify whether child had Wasting episode between 0 and 3 months 
-  summarise(stunted03=max(sepisode,na.rm=TRUE))
+  summarise(wasted03=max(sepisode,na.rm=TRUE))
 
 rec.24 <- d %>%
   filter(agecat=="24 months") %>%
@@ -349,7 +349,7 @@ rec.24 <- d %>%
   group_by(studyid,country,subjid) %>%
   mutate(rank=min_rank(-agedays)) %>%
   filter(rank<= 2) %>%
-  # flag kids with 2 measurements not stunted
+  # flag kids with 2 measurements not wasted
   mutate(rec=ifelse(whz>= -2,1,0)) %>%
   mutate(recsum=cumsum(rec)) %>%
   # one row for each kid, indicator for recovered
@@ -357,8 +357,8 @@ rec.24 <- d %>%
   mutate(rec24=ifelse(maxrec==2,1,0)) %>%
   select(-c(maxrec))
 
-rev <- full_join(stunt.03, rec.24,by=c("studyid","country","subjid")) %>%
-  mutate(s03rec24=ifelse(stunted03==1 & rec24==1,1,0)) %>%
+rev <- full_join(wast.03, rec.24,by=c("studyid","country","subjid")) %>%
+  mutate(s03rec24=ifelse(wasted03==1 & rec24==1,1,0)) %>%
   select(studyid, country,subjid, s03rec24)
 
 #--------------------------------------
@@ -398,7 +398,7 @@ vel_whz <- vel %>% filter(ycat=="whz") %>% subset(., select=c(studyid, country, 
 #--------------------------------------
 
 
-save(prev, file="U:/ucb-superlearner/Wasting rallies/st_prev_rf_outcomes.RData")
-save(cuminc, file="U:/ucb-superlearner/Wasting rallies/st_cuminc_rf_outcomes.rdata")
-save(rev, file="U:/ucb-superlearner/Wasting rallies/st_rec_rf_outcomes.RData")
-save(vel_whz, vel_lencm, file="U:/ucb-superlearner/Wasting rallies/st_vel_rf_outcomes.RData")
+save(prev, file="U:/ucb-superlearner/Wasting rallies/wast_prev_rf_outcomes.RData")
+save(cuminc, file="U:/ucb-superlearner/Wasting rallies/wast_cuminc_rf_outcomes.rdata")
+save(rev, file="U:/ucb-superlearner/Wasting rallies/wast_rec_rf_outcomes.RData")
+save(vel_whz, vel_lencm, file="U:/ucb-superlearner/Wasting rallies/wast_vel_rf_outcomes.RData")
