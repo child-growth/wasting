@@ -29,8 +29,10 @@ specify_rf_analysis <- function(A=names(adjustment_sets), Y, file,  W=NULL, V= c
 # Specify the binary analyses
 #---------------------------------------------
 
+Avars <- c( "sex",  "brthmon", "month", names(adjustment_sets))
 
-prev <- specify_rf_analysis(A=names(adjustment_sets), Y=c("wasted","swasted"), file="wast_prev_rf.Rdata")
+
+prev <- specify_rf_analysis(A=Avars, Y=c("wasted","swasted"), file="wast_prev_rf.Rdata")
 
 cuminc <- specify_rf_analysis(A=c( "sex",               "mage",          "mhtcm",         "mwtkg",        
                                    "mbmi",          "single",        "fage",          "fhtcm",       
@@ -50,8 +52,8 @@ cuminc_nobirth <- specify_rf_analysis(A=c( "gagebrth",      "birthwt",
                                       Y="ever_wasted", file="wast_cuminc_nobirth_rf.Rdata")
 
 
-rec <- specify_rf_analysis(A=names(adjustment_sets), id="subjid", Y="wast_rec90d", file="wast_rec_rf.Rdata")
-pers_wast <- specify_rf_analysis(A=names(adjustment_sets), Y="pers_wast", file="pers_wast_rf.Rdata")
+rec <- specify_rf_analysis(A=Avars, id="subjid", Y="wast_rec90d", file="wast_rec_rf.Rdata")
+pers_wast <- specify_rf_analysis(A=Avars, Y="pers_wast", file="pers_wast_rf.Rdata")
 
 
 #bind together datasets
