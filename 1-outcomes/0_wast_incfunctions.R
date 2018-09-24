@@ -1,14 +1,146 @@
 
 
 
+
+calc.prev.agecat <- function(d){
+  d = d %>% 
+    arrange(studyid,subjid,agedays) %>%
+    mutate(agecat=ifelse(agedays==1,"Birth",
+                         ifelse(agedays>2*30.4167 & agedays<4*30.4167,"3 months",
+                                ifelse(agedays>5*30.4167 & agedays<7*30.4167,"6 months",
+                                       ifelse(agedays>8*30.4167 & agedays<10*30.4167,"9 months",
+                                              ifelse(agedays>11*30.4167 & agedays<13*30.4167,"12 months",
+                                                     ifelse(agedays>14*30.4167 & agedays<16*30.4167,"15 months",
+                                                            ifelse(agedays>17*30.4167 & agedays<19*30.4167,"18 months",
+                                                                   ifelse(agedays>20*30.4167 & agedays<22*30.4167,"21 months",
+                                                                          ifelse(agedays>23*30.4167& agedays<25*30.4167,"24 months","")))))))))) %>%
+    mutate(agecat=factor(agecat,levels=c("Birth","3 months","6 months","9 months",
+                                         "12 months","15 months","18 months","21 months","24 months"))) 
+}
+
+calc.ci.agecat <- function(d){
+  d = d %>% 
+    #filter(agedays>1) %>%
+    mutate(agecat=ifelse(agedays<=3*30.4167,"0-3 months",
+                         ifelse(agedays>3*30.4167 & agedays<=6*30.4167,"3-6 months",
+                                ifelse(agedays>6*30.4167 & agedays<=9*30.4167,"6-9 months",
+                                       ifelse(agedays>9*30.4167 & agedays<=12*30.4167,"9-12 months",
+                                              ifelse(agedays>12*30.4167 & agedays<=15*30.4167,"12-15 months",
+                                                     ifelse(agedays>15*30.4167 & agedays<=18*30.4167,"15-18 months",
+                                                            ifelse(agedays>18*30.4167 & agedays<=21*30.4167,"18-21 months",
+                                                                   ifelse(agedays>21*30.4167& agedays<=24*30.4167,"21-24 months",""))))))))) %>%
+    mutate(agecat=factor(agecat,levels=c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")))
+}
+
+
+
+
+
+summary.prev <- function(d){
+  
+  # take mean of multiple measurements within age window
+  dmn <- d %>%
+    filter(!is.na(agecat)) %>%
+    group_by(studyid,country,subjid,agecat) %>%
+    summarise(whz=mean(whz)) %>%
+    mutate(wasted=ifelse(whz< -2, 1,0),swasted=ifelse(whz< -3, 1,0))
+  
+  # count measurements per study by age
+  # exclude time points if number of measurements per age
+  # in a study is <50
+  prev.data = dmn %>%
+    filter(!is.na(agecat)) %>%
+    group_by(studyid,country,agecat) %>%
+    summarise(nmeas=sum(!is.na(whz)),
+              prev=mean(wasted),
+              nxprev=sum(wasted==1)) %>%
+    filter(nmeas>=50) 
+  
+  
+  # cohort specific results
+  prev.cohort=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
+    fit.escalc(data=prev.data,ni="nmeas", xi="nxprev",age=x,meas="PR"))
+  prev.cohort=as.data.frame(do.call(rbind, prev.cohort))
+  prev.cohort=cohort.format(prev.cohort,y=prev.cohort$yi,
+                            lab=  c("Birth","3m","6m","9m","12m","15m","18m","21m","24m"))
+  
+  # estimate random effects, format results
+  prev.res=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
+    fit.rma(data=prev.data,ni="nmeas", xi="nxprev",age=x,measure="PR",nlab="children"))
+  prev.res=as.data.frame(do.call(rbind, prev.res))
+  prev.res[,4]=as.numeric(prev.res[,4])
+  prev.res = prev.res %>%
+    mutate(est=est*100,lb=lb*100,ub=ub*100)
+  prev.res$agecat=factor(prev.res$agecat,levels=c("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"))
+  prev.res$ptest.f=sprintf("%0.0f",prev.res$est)
+  
+  
+  
+  return(list(prev.data=prev.data, prev.res=prev.res, prev.cohort=prev.cohort))
+}
+
+
+
+
+
+
+summary.ci <- function(d, recovery=F){
+  
+  if(recovery==T){
+    d$wast_inc <- d$wast_rec
+  }
+  
+  evs <- d %>%
+  group_by(studyid, country, agecat, subjid) %>%
+    filter(!is.na(agecat)) %>%
+    summarise(numwast = sum(wast_inc, na.rm=T)) %>%
+    mutate(ever_wasted = 1*(numwast>0))
+  
+  # count incident cases per study by age
+  # exclude time points if number of measurements per age
+  # in a study is <50  
+  cuminc.data= evs%>%
+    group_by(studyid,country,agecat) %>%
+    summarise(
+      nchild=length(unique(subjid)),
+      nstudy=length(unique(studyid)),
+      ncases=sum(ever_wasted),
+      N=sum(length(ever_wasted))) %>%
+    filter(N>=50)
+  
+  cuminc.data
+  
+  # cohort specific results
+  ci.cohort=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x) 
+    fit.escalc(data=cuminc.data,ni="N", xi="ncases",age=x,meas="PR"))
+  ci.cohort=as.data.frame(do.call(rbind, ci.cohort))
+  ci.cohort=cohort.format(ci.cohort,y=ci.cohort$yi,
+                          lab=  c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"))
+  
+  # estimate random effects, format results
+  ci.res=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x)
+    fit.rma(data=cuminc.data,ni="N", xi="ncases",age=x,measure="PR",nlab=" measurements"))
+  ci.res=as.data.frame(do.call(rbind, ci.res))
+  ci.res[,4]=as.numeric(ci.res[,4])
+  ci.res = ci.res %>%
+    mutate(est=est*100, lb=lb*100, ub=ub*100)
+  ci.res$ptest.f=sprintf("%0.0f",ci.res$est)
+  
+  
+  return(list(cuminc.data=cuminc.data, ci.res=ci.res, ci.cohort=ci.cohort))
+  
+}
+
+
+
 #----------------------------------------------
 # markt the start of wasted of not wasted episodes 
 #----------------------------------------------
 
 mark_episodes <- function(d){
   
-  d$wasting_episode = ifelse(d$AGEDAYS==min(d$AGEDAYS) & d$wast==0, "Not Wasted", d$wasting_episode)
-  d$wasting_episode = ifelse(d$AGEDAYS==min(d$AGEDAYS) & d$wast==1, "Wasted", d$wasting_episode)
+  d$wasting_episode = ifelse(d$agedays==min(d$agedays) & d$wast==0, "Not Wasted", d$wasting_episode)
+  d$wasting_episode = ifelse(d$agedays==min(d$agedays) & d$wast==1, "Wasted", d$wasting_episode)
   d$born_wast_inc= 0
   d$wasting_episode = na.locf(d$wasting_episode, fromLast=F)#Last observation carried forward
   
@@ -17,9 +149,9 @@ mark_episodes <- function(d){
 
 mark_sevepisodes <- function(d){
   
-  d$born_sevwast_inc= ifelse(d$AGEDAYS==min(d$AGEDAYS) & d$sevwast==1,1,0)
-  d$sevwasting_episode = ifelse(d$AGEDAYS==min(d$AGEDAYS) & d$sevwast==0, "Not Severe Wasted", d$sevwasting_episode)
-  d$sevwasting_episode = ifelse(d$AGEDAYS==min(d$AGEDAYS) & d$sevwast==1, "Born Severe Wasted", d$sevwasting_episode)
+  d$born_sevwast_inc= ifelse(d$agedays==min(d$agedays) & d$sevwast==1,1,0)
+  d$sevwasting_episode = ifelse(d$agedays==min(d$agedays) & d$sevwast==0, "Not Severe Wasted", d$sevwasting_episode)
+  d$sevwasting_episode = ifelse(d$agedays==min(d$agedays) & d$sevwast==1, "Born Severe Wasted", d$sevwasting_episode)
   d$sevwasting_episode = na.locf(d$sevwasting_episode, fromLast=F)
   d$sevwasting_episode_lag=lag(d$sevwasting_episode)
   
@@ -119,48 +251,47 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   require(tidyverse)
   require(zoo)  
   
-  colnames(d) <- toupper(colnames(d))
-  
+
   #Filter out extreme or missing whz values
-  d <- d %>%  ungroup() %>% filter(!is.na(WHZ)) %>%
-    filter(WHZ > (-5) & WHZ < 5)
+  d <- d %>%  ungroup() %>% filter(!is.na(whz)) %>%
+    filter(whz > (-5) & whz < 5)
   
   #Remove duplicate ages
-  ndropped <- nrow(d[duplicated(cbind(d$SUBJID, d$AGEDAYS)), ])
-  d <- d[!duplicated(cbind(d$SUBJID, d$AGEDAYS)), ]
+  ndropped <- nrow(d[duplicated(cbind(d$subjid, d$agedays)), ])
+  d <- d[!duplicated(cbind(d$subjid, d$agedays)), ]
   if(ndropped>0) cat("\n-----------------------------------\n",ndropped," observations dropped due to duplicate ages\n_----------------------------------\n")
   
   
   #Create visit variable
   #(This replaces the visit variables, but some studies have missing 
   #visit data)
-  d <- d %>% group_by(SUBJID) %>% mutate(VISITNUM = rank(AGEDAYS))
+  d <- d %>% group_by(subjid) %>% mutate(VISITNUM = rank(agedays))
   
   
   #Extract required columns and save others to merge back in later
-  othercolumns <- d %>% subset(., select= -c(WHZ, VISITNUM)) 
-  d <- d %>% subset(., select= c(SUBJID, WHZ, AGEDAYS, VISITNUM)) 
+  othercolumns <- d %>% subset(., select= -c(whz, VISITNUM)) 
+  d <- d %>% subset(., select= c(subjid, whz, agedays, VISITNUM)) 
   
   
   #generate wasting and severe wasting indicators
-  d$wast= ifelse(d$WHZ < (-2),1,0)
-  d$sevwast= ifelse(d$WHZ < (-3),1,0)
+  d$wast= ifelse(d$whz < (-2),1,0)
+  d$sevwast= ifelse(d$whz < (-3),1,0)
   
   # #Generate variables for length of period in days between prior observation and current observations
   # #and the next observations and current observations. Also generate variables for if child changed from
   # #not wasted to wasted (or severe wasted) between the last observation and the current observation.
   d <- d %>%
-    arrange(SUBJID, AGEDAYS) %>%
-    group_by(SUBJID) %>%
+    arrange(subjid, agedays) %>%
+    group_by(subjid) %>%
     mutate(
-      agelag=lag(AGEDAYS),
+      agelag=lag(agedays),
       wastlag=lag(wast),
       sevwastlag=lag(sevwast),
-      midpoint_age = AGEDAYS - (AGEDAYS - agelag)/2,
+      midpoint_age = agedays - (agedays - agelag)/2,
       wastchange = wast - lag(wast),
       sevwastchange = sevwast - lag(sevwast),
-      delta_age = AGEDAYS-agelag,
-      firstmeasure = AGEDAYS==min(AGEDAYS)
+      delta_age = agedays-agelag,
+      firstmeasure = agedays==min(agedays)
     ) %>%
     as.data.frame()
   
@@ -169,17 +300,17 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$sevwastlag[d$firstmeasure] <- 0
   d$wastchange[d$firstmeasure] <- d$wast[d$firstmeasure]
   d$sevwastchange[d$firstmeasure] <- d$sevwast[d$firstmeasure]
-  d$midpoint_age[is.na(d$midpoint_age)] <- d$AGEDAYS[is.na(d$midpoint_age)]/2
-  d$delta_age[d$firstmeasure] <-d$AGEDAYS[d$firstmeasure]
+  d$midpoint_age[is.na(d$midpoint_age)] <- d$agedays[is.na(d$midpoint_age)]/2
+  d$delta_age[d$firstmeasure] <-d$agedays[d$firstmeasure]
   
   #Length of each observation period
-  d <- d %>% group_by(SUBJID) %>% 
+  d <- d %>% group_by(subjid) %>% 
     mutate(
       next_midpoint = lead(midpoint_age)
     )
   
   #Assume 30 day period after final measurement (so midpoint will be 15 days after final measure)
-  d$next_midpoint[is.na(d$next_midpoint)] <- d$AGEDAYS[is.na(d$next_midpoint)] + 15
+  d$next_midpoint[is.na(d$next_midpoint)] <- d$agedays[is.na(d$next_midpoint)] + 15
   d$period_length <- (d$next_midpoint - d$midpoint_age)
   
   
@@ -190,7 +321,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   for(i in 1:washout){
     
-    d <- d %>% group_by(SUBJID) %>%
+    d <- d %>% group_by(subjid) %>%
       mutate(
         wast_lag_i  = lag(wast, i),
         sevwast_lag_i  = lag(sevwast, i),
@@ -237,19 +368,19 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   #Is there a cleaner way of preventing recording the incidences earlier?
   table(d$wast_inc)
   
-  d <- d %>% group_by(SUBJID) %>% 
+  d <- d %>% group_by(subjid) %>% 
     mutate(sum_wast_inc=cumsum(wast_inc),
            sum_wast_rec=cumsum(wast_rec_inc))
   for(i in 1:nrow(d)){
     if(d$wast_inc[i]==1 & (d$sum_wast_inc[i]-d$sum_wast_rec[i] > 1)){
       d$wast_inc[i] <- 0 
-      d <- d %>% group_by(SUBJID) %>% 
+      d <- d %>% group_by(subjid) %>% 
         mutate(sum_wast_inc=cumsum(wast_inc),
                sum_wast_rec=cumsum(wast_rec_inc))        
     }
     if(d$wast_rec_inc[i]==1 & (d$sum_wast_inc[i]-d$sum_wast_rec[i] < 0)){
       d$wast_rec_inc[i] <- 0 
-      d <- d %>% group_by(SUBJID) %>% 
+      d <- d %>% group_by(subjid) %>% 
         mutate(sum_wast_inc=cumsum(wast_inc),
                sum_wast_rec=cumsum(wast_rec_inc))  
     }
@@ -265,26 +396,26 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$wasting_episode[d$wast_rec_inc==1] <- "Not Wasted"
   
   
-  d <- d %>% group_by(SUBJID) %>%  arrange(AGEDAYS)
+  d <- d %>% group_by(subjid) %>%  arrange(agedays)
   
   #Have to mark first observations as wasted or not wasted if dropBornWasted=F
   if(dropBornWasted==F){
     
-    d <- d %>% group_by(SUBJID) %>%
+    d <- d %>% group_by(subjid) %>%
       do(mark_episodes(.))
     
-    # d <- d %>% group_by(SUBJID) %>% 
-    #   mutate(wasting_episode = ifelse(AGEDAYS==min(AGEDAYS) & wast==0, "Not Wasted", wasting_episode),
-    #          wasting_episode = ifelse(AGEDAYS==min(AGEDAYS) & wast==1, "Wasted", wasting_episode),
+    # d <- d %>% group_by(subjid) %>% 
+    #   mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
+    #          wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Wasted", wasting_episode),
     #          born_wast_inc= 0,
     #          wasting_episode = na.locf(wasting_episode, fromLast=F)) %>% #Last observation carried forward 
     #   ungroup()
   }else{
-    d <- d %>% group_by(SUBJID) %>% 
-      mutate(wasting_episode = ifelse(AGEDAYS==min(AGEDAYS) & wast==0, "Not Wasted", wasting_episode),
-             wasting_episode = ifelse(AGEDAYS==min(AGEDAYS) & wast==1, "Born Wasted", wasting_episode),
+    d <- d %>% group_by(subjid) %>% 
+      mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
+             wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Born Wasted", wasting_episode),
              wast_inc = ifelse(wasting_episode=="Born Wasted",0, wast_inc),
-             born_wast_inc= ifelse(AGEDAYS==min(AGEDAYS) & wasting_episode=="Born Wasted",1,0),
+             born_wast_inc= ifelse(agedays==min(agedays) & wasting_episode=="Born Wasted",1,0),
              wasting_episode = na.locf(wasting_episode, fromLast=F)) %>% #Last observation carried forward 
       ungroup()      
   }
@@ -296,23 +427,23 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   
   #Calculate duration of wasting episodes
-  d <- d %>%  group_by(SUBJID) %>%
+  d <- d %>%  group_by(subjid) %>%
     mutate(episode_ID = cumsum(born_wast_inc+wast_inc+wast_rec_inc) + 1) %>% #Create unique episode ID
-    ungroup() %>% group_by(SUBJID, episode_ID) %>%
+    ungroup() %>% group_by(subjid, episode_ID) %>%
     mutate(incident_age = min(midpoint_age),
-           maxage=max(AGEDAYS))
+           maxage=max(agedays))
   
   #Calculate duration for each episode
   #Note: this code implicitly censors the final epsiode as the lead(incident_age) will be NA
   d_episode <- d %>% 
-    subset(., select=c(SUBJID,
+    subset(., select=c(subjid,
                        episode_ID, incident_age)) %>%
-    group_by(SUBJID, episode_ID) %>%
-    slice(1) %>% ungroup() %>% group_by(SUBJID) %>%
+    group_by(subjid, episode_ID) %>%
+    slice(1) %>% ungroup() %>% group_by(subjid) %>%
     mutate(duration=lead(incident_age)-incident_age) %>%
     subset(., select= -incident_age)
   
-  d <- left_join(d, d_episode, by=c("SUBJID","episode_ID"))
+  d <- left_join(d, d_episode, by=c("subjid","episode_ID"))
   
   
   
@@ -321,7 +452,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$wasting_duration[d$wasting_episode=="Wasted"] <- d$duration[d$wasting_episode=="Wasted"]
   
   #View duration calculations
-  # df <- d %>% subset(., select=c(SUBJID, AGEDAYS, WHZ, wast_rec_inc, wasting_episode, episode_ID, duration))
+  # df <- d %>% subset(., select=c(subjid, agedays, whz, wast_rec_inc, wasting_episode, episode_ID, duration))
   # View(df)
   
   #---------------------------------------------------------
@@ -342,15 +473,15 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   #Have to mark first observations as wasted or not wasted if dropBornWasted=F
   if(dropBornWasted==T){
     
-    d <- d %>% group_by(SUBJID) %>%
+    d <- d %>% group_by(subjid) %>%
       do(mark_sevepisodes(.))
     
   }else{
-    d <- d %>% group_by(SUBJID) %>% 
+    d <- d %>% group_by(subjid) %>% 
       mutate(
         sevwasting_episode = ifelse
-        (AGEDAYS==min(AGEDAYS) & sevwast==0, "Not Severe Wasted", sevwasting_episode),
-        sevwasting_episode = ifelse(AGEDAYS==min(AGEDAYS) & sevwast==1, "Severe Wasted", sevwasting_episode),
+        (agedays==min(agedays) & sevwast==0, "Not Severe Wasted", sevwasting_episode),
+        sevwasting_episode = ifelse(agedays==min(agedays) & sevwast==1, "Severe Wasted", sevwasting_episode),
         sevwasting_episode = na.locf(sevwasting_episode, fromLast=F),
         sevwasting_episode_lag=lag(sevwasting_episode)) %>% #Last observation carried forward 
       ungroup()     
@@ -364,7 +495,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   
   #Create unique severe wasting episode IDs
-  d <- d %>%  group_by(SUBJID) %>%
+  d <- d %>%  group_by(subjid) %>%
     mutate(sev_episode_ID = cumsum(sevwast_inc+born_sevwast_inc+sevwast_rec_inc) + 1) %>% #Create unique episode ID
     ungroup() 
   
@@ -374,23 +505,23 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   
   #Calculate duration of severe wasting episodes
-  d <- d  %>% group_by(SUBJID, sev_episode_ID) %>%
+  d <- d  %>% group_by(subjid, sev_episode_ID) %>%
     mutate(sev_incident_age = min(midpoint_age),
-           sev_maxage=max(AGEDAYS))
+           sev_maxage=max(agedays))
   
   
   
   d_sev_episode <- d %>% 
-    subset(., select=c(SUBJID, sev_episode_ID, sev_incident_age)) %>%
-    group_by(SUBJID, sev_episode_ID) %>%
-    slice(1) %>% ungroup() %>% group_by(SUBJID) %>%
+    subset(., select=c(subjid, sev_episode_ID, sev_incident_age)) %>%
+    group_by(subjid, sev_episode_ID) %>%
+    slice(1) %>% ungroup() %>% group_by(subjid) %>%
     mutate(sevduration=lead(sev_incident_age)-sev_incident_age) %>%
     subset(., select= -sev_incident_age)
   
-  d <- left_join(d, d_sev_episode, by=c("SUBJID","sev_episode_ID"))
+  d <- left_join(d, d_sev_episode, by=c("subjid","sev_episode_ID"))
   
   #Set duration of any censored episode to NA
-  d <- d %>% group_by(SUBJID) %>%
+  d <- d %>% group_by(subjid) %>%
     mutate(sevduration = ifelse(sev_maxage==max(sev_maxage), NA, sevduration)) %>% 
     ungroup()
   
@@ -411,7 +542,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$sevwast_inc30d <- d$sevwast_inc60d <- d$sevwast_inc90d <- NA
   d$sevwast_inc30d[d$wast_inc==1] <- d$sevwast_inc60d[d$wast_inc==1] <- d$sevwast_inc90d[d$wast_inc==1] <- 0
   for(i in 1:90){
-    d <- d %>% group_by(SUBJID) %>%
+    d <- d %>% group_by(subjid) %>%
       mutate(
         rec_inc_lead_i = lead(wast_rec_inc, i),
         sev_inc_lead_i = lead(sevwast_inc, i),
@@ -464,7 +595,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   }
   
   #merge back in other columns
-  d <- merge(d, othercolumns, by=c("SUBJID", "AGEDAYS"))
+  d <- merge(d, othercolumns, by=c("subjid", "agedays"))
   
   #rename columns to match other functions
   d <- d %>% rename(wast_rec = wast_rec_inc,
@@ -487,7 +618,7 @@ WastIncTable<-function(d, strat=T, agecats=c(6*30.4167, 12*30.4167, 18*30.4167, 
   
   
   if(strat==T){
-    d$agecat <- as.factor(findInterval(d$AGEDAYS, agecats, rightmost.closed=F))
+    d$agecat <- as.factor(findInterval(d$agedays, agecats, rightmost.closed=F))
   }  
   
   summary<-WastIncSummary(d, strat=strat)
@@ -528,10 +659,10 @@ WastIncTable<-function(d, strat=T, agecats=c(6*30.4167, 12*30.4167, 18*30.4167, 
 WastIncSummary<-function(d, strat=F){
   require(epitools)
   
-  d <- d %>% arrange(SUBJID, AGEDAYS)
+  d <- d %>% arrange(subjid, agedays)
   
   #Average number of measurements per child
-  child_nmeas <- d %>% group_by(SUBJID) %>%
+  child_nmeas <- d %>% group_by(subjid) %>%
     summarize(num_measurements=n()) %>% ungroup() %>% 
     summarize(num_children=n(),
               num_measurements=mean(num_measurements))
@@ -540,8 +671,8 @@ WastIncSummary<-function(d, strat=F){
   #Overall sum and means
   Incidence_df <- d %>% 
     summarize(      
-      prev_wast= mean(WHZ < -2, na.rm=T) * 100,
-      prev_sevwast= mean(WHZ < -3, na.rm=T) * 100,
+      prev_wast= mean(whz < -2, na.rm=T) * 100,
+      prev_sevwast= mean(whz < -3, na.rm=T) * 100,
       anywast= ifelse(sum(wast) > 0 ,1,0) * 100,
       anysevwast= ifelse(sum(sevwast) > 0 ,1,0) * 100,
       persontime=sum(pt_wast, na.rm=T),
@@ -581,7 +712,7 @@ WastIncSummary<-function(d, strat=F){
   #Calculate average episode lengths
   episode_duration <- d %>% ungroup() %>%
     filter(wast_inc==1) %>% #drop non-wasting periods
-    subset(., select=c(SUBJID,agecat,wasting_duration)) %>% 
+    subset(., select=c(subjid,agecat,wasting_duration)) %>% 
     as.data.frame()
   
   # #Calculate mean total duration of wasting per child
@@ -589,12 +720,14 @@ WastIncSummary<-function(d, strat=F){
   # experience wasting, so kids who are never wasted have duration
   # of 0, not NA.
   duration <- episode_duration %>%
-    group_by(SUBJID) %>%
+    group_by(subjid) %>%
     summarize(
       total_duration= sum(wasting_duration, na.rm=T)
     )
   
   
+  total_duration <- mean(duration$total_duration, na.rm=T)
+  average_duration <- mean(episode_duration$wasting_duration, na.rm=T)
   
   #Create taable of summary statistics
   tab <- data.frame(child_nmeas, Incidence_df[1:4], total_duration, average_duration, Incidence_df[-c(1:4, 13:24)])
@@ -604,10 +737,10 @@ WastIncSummary<-function(d, strat=F){
   try(
     means <- rbind(
       #longitudinal prevalence
-      mean95CI(Y=(d$WHZ < -2), id=d$SUBJID, proportion=T, percent=F),
-      mean95CI(Y=(d$WHZ < -3), id=d$SUBJID, proportion=T, percent=F),
+      mean95CI(Y=(d$whz < -2), id=d$subjid, proportion=T, percent=F),
+      mean95CI(Y=(d$whz < -3), id=d$subjid, proportion=T, percent=F),
       #duration
-      mean95CI(Y=episode_duration$wasting_duration, id=episode_duration$SUBJID, proportion=F, percent=F),
+      mean95CI(Y=episode_duration$wasting_duration, id=episode_duration$subjid, proportion=F, percent=F),
       #incidence rates
       mean95CI(tab$wast_ep, persontime=tab$persontime, count=T) * c(1,rep(1000,5)),
       mean95CI(tab$sevwast_ep, persontime=tab$sev_persontime, count=T) * c(1,rep(1000,5)),
@@ -722,6 +855,241 @@ tab_format <- function(tab){
   return(list(tab1,tab2,tab3, tab))
 }
 
+
+
+
+
+
+
+
+
+
+
+
+#---------------------------------------
+# Plot parameters
+#---------------------------------------
+#Plot themes
+theme_set(theme_bw())
+
+#hbgdki pallet
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+
+
+
+
+#---------------------------------------
+# fit.rma function
+#---------------------------------------
+
+# random effects function, save results nicely
+fit.rma=function(data,age,ni,xi,measure,nlab){
+  data=filter(data,agecat==age)
+  if(measure!="IR"){
+    fit<-rma(ni=data[[ni]], xi=data[[xi]], 
+             method="REML", measure=measure)
+  }else{
+    fit<-rma(ti=data[[ni]], xi=data[[xi]], 
+             method="REML", measure=measure)
+  }
+  out=data %>%
+    ungroup() %>%
+    summarise(nstudies=length(unique(studyid)),
+              nmeas=sum(data[[ni]][agecat==age])) %>%
+    mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
+           nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
+                          " ",nlab),
+           nstudy.f=paste0("N=",nstudies," studies"))
+  return(out)
+}
+
+
+
+# random effects function, save results nicely
+fit.cont.rma=function(data,age,yi,vi,ni,nlab){
+  
+  data=filter(data,agecat==age)
+  
+  fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML")
+  
+  out = data %>%
+    ungroup() %>%
+    summarise(nstudies=length(unique(studyid)),
+              nmeas=sum(data[[ni]][agecat==age])) %>%
+    mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
+           nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
+                          " ",nlab),
+           nstudy.f=paste0("N=",nstudies," studies"))
+  return(out)
+}
+
+
+
+
+
+sem<-function(x){
+  sd(x)/sqrt(length(x))
+}
+
+
+
+#---------------------------------------
+# fit.escalc function
+#---------------------------------------
+
+# calc individual cohort PR variances, standard errors, and 95% CI from the rma() arguements, and append to dataset
+# Input:
+# meas: PR for prevalence, CI for cumulative incidence, and IR for incidence rate
+
+#Returns:
+# Inputted dataframe with appended columns
+# yi = outcome of interest
+# vi = variance of outcome
+# se = standard error
+# ci.lb = lower bound of 95% confidence interval
+# ci.ub = upper bound of 95% confidence interval
+
+fit.escalc <- function(data,age,ni,xi, meas){
+  data=filter(data,agecat==age)
+  
+  if(meas=="PR"){
+    data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PR", append=T)
+  }
+  
+  if(meas=="IR"){
+    data<-escalc(data=data, ti=data[[ni]], xi=data[[xi]], method="REML", measure="IR", append=T)
+  }
+  
+  data$se <- sqrt(data$vi)
+  data$ci.lb <- data$yi - 1.96 * data$se 
+  data$ci.ub <- data$yi + 1.96 * data$se 
+  
+  return(data)
+}
+
+
+fit.escalc.cont <- function(data,age,ni,xi, meas){
+  data=filter(data,agecat==age)
+  
+  data <- escalc(yi=data[[yi]], vi=data[[vi]], method="REML")
+  
+  data$se <- sqrt(data$vi)
+  data$ci.lb <- data$yi - 1.96 * data$se 
+  data$ci.ub <- data$yi + 1.96 * data$se 
+  
+  return(data)
+}
+
+
+#---------------------------------------
+# cohort-specific output formatting
+#---------------------------------------
+# if percentage, multiply est and ci by 100
+# create cohort name for plotting
+# create region variable 
+# add age labels for x-axis
+
+# Input:
+# data frame with fit.escalc output 
+# vector of labels for plotting
+
+#Returns:
+# data frame formatted for plotting cohort specific results
+cohort.format=function(df, lab, y, est="percent"){
+  y = as.numeric(y)
+  
+  # rescale percentages
+  if(est=="percent"){
+    df = df %>% mutate(y=y*100,ci.lb=ci.lb*100,ci.ub=ci.ub*100)
+  }
+  if(est=="rate"){
+    df = df %>% mutate(y=y*1000,ci.lb=ci.lb*1000,ci.ub=ci.ub*1000)
+  }
+  
+  # cohort name
+  df = df %>% mutate(cohort=paste0(studyid,"-",country)) %>%
+    mutate(cohort=gsub("ki[^-]*-","",cohort))
+  
+  # region variable
+  df <- df %>% mutate(region = case_when(
+    country=="BANGLADESH" | country=="INDIA"|
+      country=="NEPAL" | country=="PAKISTAN"|
+      country=="PHILIPPINES"                   ~ "Asia", 
+    country=="KENYA"|
+      country=="GHANA"|
+      country=="BURKINA FASO"|
+      country=="GUINEA-BISSAU"|
+      country=="MALAWI"|
+      country=="SOUTH AFRICA"|
+      country=="TANZANIA, UNITED REPUBLIC OF"|
+      country=="ZIMBABWE"|
+      country=="GAMBIA"                       ~ "Africa",
+    country=="BELARUS"                      ~ "Europe",
+    country=="BRAZIL" | country=="GUATEMALA" |
+      country=="PERU"                         ~ "Latin America",
+    TRUE                                    ~ "Other"
+  ))
+  
+  # create formatted age categories for plotting 
+  df <- df %>%  mutate(agecat=droplevels(as.factor(agecat)))
+  df <- df %>%  mutate(age.f = factor(agecat,levels=levels(df$agecat),
+                                      labels=lab))
+  
+  return(df)
+}
+
+
+
+
+
+
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
 
 
 
