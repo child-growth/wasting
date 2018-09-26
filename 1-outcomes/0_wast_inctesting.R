@@ -5,8 +5,8 @@ rm(list=ls())
 source("C:/Users/andre/Documents/HBGDki/Wasting/1-outcomes/0_wast_incfunctions.R")
 
 
-#load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata.Rdata")
- load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata2.Rdata")
+load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata.Rdata")
+ #load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata2.Rdata")
  #load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata3.Rdata")
 #d <- d %>% filter(subjid==3)
 d$country <- "null"

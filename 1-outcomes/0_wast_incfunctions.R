@@ -123,7 +123,6 @@ summary.whz <- function(d){
 
 
 
-
 summary.ci <- function(d, recovery=F){
   
   if(recovery==T){
@@ -1069,7 +1068,9 @@ fit.cont.rma=function(data,age,yi,vi,ni,nlab){
   
   data=filter(data,agecat==age)
   
-  fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML", measure = "GEN")
+  fit <- NULL
+  try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML", measure = "GEN"))
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="ML", measure = "GEN"))}
   
   out = data %>%
     ungroup() %>%
@@ -1132,7 +1133,7 @@ fit.escalc <- function(data,age,ni,xi, meas){
 fit.escalc.cont <- function(data,age,yi,vi, meas){
   data=filter(data,agecat==age)
   
-  data <- escalc(yi=data[[yi]], vi=data[[vi]], method="REML", measure="GEN")
+  data <- data.frame(data, escalc(yi=data[[yi]], vi=data[[vi]], method="REML", measure="GEN"))
   
   data$se <- sqrt(data$vi)
   data$ci.lb <- data$yi - 1.96 * data$se 
