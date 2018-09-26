@@ -22,7 +22,7 @@ tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
                "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
 
 # load base functions
-source("C:/Users/andre/Documents/HBGDki/Wasting/1-outcomes/0_st_basefunctions.R")
+#source("C:/Users/andre/Documents/HBGDki/Wasting/1-outcomes/0_st_basefunctions.R")
 
 load("C:/Users/andre/Documents/HBGDki/Results/Wasting_descriptive_epi_results.Rdata")
 
@@ -61,9 +61,9 @@ p1 <- ggplot(prev.res,aes(y=est,x=agecat)) +
   scale_color_manual(values=rep(tableau10[1],20))+  scale_fill_manual(values=rep(tableau10[1],20))+
   xlab("Age category")+
   ylab("Point prevalence (95% CI)")+
-  scale_y_continuous(limits=c(-4,60))+
-  annotate("text",x=prev.res$agecat,y=0,label=prev.res$nmeas.f,size=3)+
-  annotate("text",x=prev.res$agecat,y=-3,label=prev.res$nstudy.f,size=3)+
+  scale_y_continuous(limits=c(0,16))+
+  annotate("text",x=prev.res$agecat,y=2,label=prev.res$nmeas.f,size=3)+
+  annotate("text",x=prev.res$agecat,y=0,label=prev.res$nstudy.f,size=3)+
   annotate("text",label=prev.res$ptest.f,x=prev.res$agecat,
            y=prev.res$est,hjust=-0.75,size=3)+
   ggtitle("Pooled point prevalence of wasting") +
@@ -71,7 +71,7 @@ p1 <- ggplot(prev.res,aes(y=est,x=agecat)) +
         legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12)) 
-
+p1
 ggsave(p1, file="pooled_prev.png", width=10, height=4)
 
 
@@ -91,11 +91,11 @@ p2 <- ggplot(ci.res, aes(y=est,x=agecat.f, color=agecat.f)) +
   geom_linerange(aes(ymin=lb, ymax=ub),
                  alpha=0.5, size = 3) +
   scale_color_manual(values=rep(tableau10[2],20))+  scale_fill_manual(values=rep(tableau10[2],20))+
-  scale_y_continuous(limits=c(0,100))+
+  scale_y_continuous(limits=c(0,25))+
   xlab("Age category")+
   ylab("Cumulative incidence per 100 children (95% CI)")+
-  annotate("text",x=ci.res$agecat.f,y=5,label=ci.res$nmeas.f,size=3)+
-  annotate("text",x=ci.res$agecat.f,y=1,label=ci.res$nstudy.f,size=3)+
+  annotate("text",x=ci.res$agecat.f,y=3,label=ci.res$nmeas.f,size=3)+
+  annotate("text",x=ci.res$agecat.f,y=0,label=ci.res$nstudy.f,size=3)+
   annotate("text",label=ci.res$ptest.f,x=ci.res$agecat.f,
            y=ci.res$est,hjust=-0.75,size=3)+
   ggtitle("Pooled cumulative incidence of wasting") +
@@ -103,7 +103,7 @@ p2 <- ggplot(ci.res, aes(y=est,x=agecat.f, color=agecat.f)) +
         legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12)) 
-
+p2
 ggsave(p2, file="pooled_CI.png", width=10, height=4)
 
 
@@ -122,19 +122,19 @@ p2_nobirth <- ggplot(ci.res, aes(y=est,x=agecat.f, color=agecat.f)) +
   geom_linerange(aes(ymin=lb, ymax=ub),
                  alpha=0.5, size = 3) +
   scale_color_manual(values=rep(tableau10[2],20))+  scale_fill_manual(values=rep(tableau10[2],20))+
-  scale_y_continuous(limits=c(0,100))+
+  scale_y_continuous(limits=c(0,7.5))+
   xlab("Age category")+
   ylab("Cumulative incidence per 100 children (95% CI)")+
-  annotate("text",x=ci.res$agecat.f,y=5,label=ci.res$nmeas.f,size=3)+
-  annotate("text",x=ci.res$agecat.f,y=1,label=ci.res$nstudy.f,size=3)+
+  annotate("text",x=ci.res$agecat.f,y=1,label=ci.res$nmeas.f,size=3)+
+  annotate("text",x=ci.res$agecat.f,y=0,label=ci.res$nstudy.f,size=3)+
   annotate("text",label=ci.res$ptest.f,x=ci.res$agecat.f,
            y=ci.res$est,hjust=-0.75,size=3)+
-  ggtitle("Pooled cumulative incidence of wasting") +
+  ggtitle("Pooled cumulative incidence of wasting- excluding wasting at birth") +
   theme(strip.background = element_blank(),
         legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12)) 
-
+p2_nobirth
 ggsave(p2_nobirth, file="pooled_CI_no_birth.png", width=10, height=4)
 
 
@@ -153,7 +153,7 @@ p3 <- ggplot(rev.res,aes(y=est,x=agecat))+
                  alpha=0.5, size = 3) +
   scale_color_manual(values=rep(tableau10[3],20))+  scale_fill_manual(values=rep(tableau10[3],20))+
   xlab("Age category")+ ylab("Percentage (95% CI)")+
-  scale_y_continuous(limits=c(0,75))+
+  scale_y_continuous(limits=c(0,12.5))+
   annotate("text",x=rev.res$agecat,y=1.2,label=rev.res$nmeas.f,size=3)+
   annotate("text",x=rev.res$agecat,y=0.1,label=rev.res$nstudy.f,size=3)+
   annotate("text",label=rev.res$ptest.f,x=rev.res$agecat,
@@ -163,7 +163,7 @@ p3 <- ggplot(rev.res,aes(y=est,x=agecat))+
         legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12)) 
-
+p3
 ggsave(p3, file="pooled_rev.png", width=10, height=4)
 
 
@@ -182,18 +182,17 @@ df$agecat.f2 <- clean_agecat(df$agecat)
 p4 <- ggplot(df, aes(y=est*1000,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
   geom_point( size = 4, position=position_dodge(width=0.25)) +
   geom_linerange(aes(ymin=lb*1000, ymax=ub*1000), alpha=0.5, size = 3) +
-  scale_y_continuous(limits=c(-2,100))+
+  scale_y_continuous(limits=c(-1,7))+
   xlab("Age category") +
   ylab("Percent wasted (95% CI)") +
-  annotate("text",x=df$agecat.f2,y=1,label=df$nmeas.f,size=3) +
-  annotate("text",x=df$agecat.f2,y=-2,label=df$nstudy.f,size=3) +
-  annotate("text",x=df$agecat.f2, y=5,label="N's for incidence proportion within age ranges",size=4, hjust = 0) +
-  annotate("text",label=df$ptest.f,x=df$agecat.f2, y=df$est,hjust=-2,size=3)+
+  annotate("text",x=df$agecat.f2,y=-1,label=df$nmeas.f,size=3) +
+  annotate("text",x=df$agecat.f2,y=0,label=df$nstudy.f,size=3) +
+  annotate("text",label=df$ptest.f,x=df$agecat.f2, y=df$est*1000,hjust=-2,size=3)+
   theme(strip.background = element_blank(), strip.text.x = element_text(size=12)) +
   scale_colour_manual(values=rep(tableau10[10],20)) +
-  ggtitle("Pooled cumulative incidence of wasting") +
+  ggtitle("Pooled wasting incidence rate per 1,000 days") +
   theme(strip.background = element_blank(),
-        legend.position="right",
+        legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12)) 
 p4
@@ -213,18 +212,17 @@ df$agecat.f2 <- clean_agecat(df$agecat)
 p4_nobirth <- ggplot(df, aes(y=est*1000,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
   geom_point( size = 4, position=position_dodge(width=0.25)) +
   geom_linerange(aes(ymin=lb*1000, ymax=ub*1000), alpha=0.5, size = 3) +
-  scale_y_continuous(limits=c(-2,100))+
+  scale_y_continuous(limits=c(-1,30))+
   xlab("Age category") +
   ylab("Percent wasted (95% CI)") +
-  annotate("text",x=df$agecat.f2,y=1,label=df$nmeas.f,size=3) +
-  annotate("text",x=df$agecat.f2,y=-2,label=df$nstudy.f,size=3) +
-  annotate("text",x=df$agecat.f2, y=5,label="N's for incidence proportion within age ranges",size=4, hjust = 0) +
-  annotate("text",label=df$ptest.f,x=df$agecat.f2, y=df$est,hjust=-2,size=3)+
+  annotate("text",x=df$agecat.f2,y=-1,label=df$nmeas.f,size=3) +
+  annotate("text",x=df$agecat.f2,y=0,label=df$nstudy.f,size=3) +
+  annotate("text",label=df$ptest.f,x=df$agecat.f2, y=df$est*1000,hjust=-2,size=3)+
   theme(strip.background = element_blank(), strip.text.x = element_text(size=12)) +
   scale_colour_manual(values=rep(tableau10[10],20)) +
-  ggtitle("Pooled cumulative incidence of wasting") +
+  ggtitle("Pooled wasting incidence rate per 1,000 days - no birth wasting") +
   theme(strip.background = element_blank(),
-        legend.position="right",
+        legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12)) 
 p4_nobirth
@@ -249,7 +247,7 @@ p7 <- ggplot(dur, aes(y=Mean,x=strata))+
   geom_point(aes(fill=strata, color=strata), size = 4) +
   geom_linerange(aes(ymin=Lower.95.CI, ymax=Upper.95.CI, color=strata),
                  alpha=0.5, size = 3) +
-  scale_color_manual(values=rep(tableau10[4],20))+  
+  scale_color_manual(values=rep(tableau10[4],20))+
   xlab("Age category")+ ylab("")+
   #scale_y_continuous(limits=c(0,20))+
   # annotate("text",x=vel$strata,y=.12,label=vel$nmeas.f,size=3)+
@@ -258,7 +256,7 @@ p7 <- ggplot(dur, aes(y=Mean,x=strata))+
   theme(strip.background = element_blank(),
         legend.position="none",
         strip.text.x = element_text(size=12),
-        axis.text.x = element_text(size=12, angle = 25, hjust = 1)) 
+        axis.text.x = element_text(size=12, angle = 25, hjust = 1))
 p7
 ggsave(p7, file="pooled_duration.png", width=10, height=4)
 

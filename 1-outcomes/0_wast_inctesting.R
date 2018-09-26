@@ -33,6 +33,9 @@ sum(df$pt_wast_rec)
 sum(df$wast_inc[df$agedays <= 6*30.4167])
 sum(df$wast_rec[df$agedays <= 6*30.4167])
 
+sum(df$pt_wast + df$pt_wast_rec + df$pt_washout, na.rm=T) #Should be 35800 in the test data.
+
+
 
 df2 <- WastIncCalc(d, dropBornWasted=T)
 sum(df2$wast_inc, na.rm=T)
@@ -42,6 +45,9 @@ sum(df2$pt_wast_rec, na.rm=T)
 
 sum(df2$wast_inc[df2$agedays <= 6*30.4167], na.rm=T)
 sum(df2$wast_rec[df2$agedays <= 6*30.4167], na.rm=T)
+
+
+df[which(df$pt_wast_rec!=df2$pt_wast_rec),]
 
 #need to write function in a way that summarizesnstatistics like instunting
 
@@ -96,6 +102,6 @@ rec.ir.data <- summary.ir(d, recovery = T)
 dur.data <- summary.dur(d) 
 
 
-save(prev.data, whz.data, ci.data, ci.data.nobirth, rec.data, ir.data, ir.data.nobirth, rec.ir.data, dur.data, file="C:/Users/andre/Documents/HBGDki/Results/Wasting_descriptive_epi_results.Rdata")
+#save(prev.data, whz.data, ci.data, ci.data.nobirth, rec.data, ir.data, ir.data.nobirth, rec.ir.data, dur.data, file="C:/Users/andre/Documents/HBGDki/Results/Wasting_descriptive_epi_results.Rdata")
 
 
