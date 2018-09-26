@@ -133,6 +133,118 @@ summary.ci <- function(d, recovery=F){
 
 
 
+
+
+summary.ir <- function(d, recovery=F){
+  if(recovery==T){
+    d$wast_inc <- d$wast_rec
+    d$pt_wast_rec <- d$pt_wast_rec
+  }
+  
+  # manually calculate incident cases, person-time at risk at each time point
+  cruderate<-d %>%
+    group_by(agecat) %>%
+    summarise(inc.case=sum(wast_inc, na.rm=T),ptar=sum(pt_wast, na.rm=T)) %>%
+    mutate(cruderate=inc.case/ptar)
+  print(cruderate)
+  
+  # count incident cases and sum person time at risk per study by age
+  # exclude time points if number of children per age
+  # in a study is <50  
+  inc.data = d %>%
+    group_by(studyid,country,agecat) %>%
+    summarise(ptar=sum(pt_wast, na.rm=T),
+              ncase=sum(wast_inc, na.rm=T),
+              nchild=length(unique(subjid)),
+              nstudy=length(unique(studyid))) %>%
+    filter(nchild>=50)
+  
+  
+  
+  
+  # cohort specific results
+  inc.cohort=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x) 
+    fit.escalc(data=inc.data,ni="ptar", xi="ncase",age=x,meas="IR"))
+  inc.cohort=as.data.frame(do.call(rbind, inc.cohort))
+  inc.cohort$agecat=factor(inc.cohort$agecat,levels=
+                             c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"))
+  inc.cohort$yi.f=sprintf("%0.0f",inc.cohort$yi)
+  inc.cohort$cohort=paste0(inc.cohort$studyid,"-",inc.cohort$country)
+  inc.cohort = inc.cohort %>% mutate(region = ifelse(country=="BANGLADESH" | country=="INDIA"|
+                                                       country=="NEPAL" | country=="PAKISTAN"|
+                                                       country=="PHILIPPINES" ,"Asia",
+                                                     ifelse(country=="BURKINA FASO"|
+                                                              country=="GUINEA-BISSAU"|
+                                                              country=="MALAWI"|
+                                                              country=="SOUTH AFRICA"|
+                                                              country=="TANZANIA, UNITED REPUBLIC OF"|
+                                                              country=="ZIMBABWE"|
+                                                              country=="GAMBIA","Africa",
+                                                            ifelse(country=="BELARUS","Europe",
+                                                                   "Latin America"))))
+
+  
+  # estimate random effects, format results
+  ir.res=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x)
+    fit.rma(data=inc.data,ni="ptar", xi="ncase",age=x,measure="IR",nlab=" person-days"))
+  ir.res=as.data.frame(do.call(rbind, ir.res))
+  ir.res[,4]=as.numeric(ir.res[,4])
+
+  ir.res$pt.f=paste0("N=",format(ir.res$nmeas,big.mark=",",scientific=FALSE),
+                     " person-days")
+  ir.res$ptest.f=sprintf("%0.02f",ir.res$est*1000)
+  
+  return(list(ir.data=inc.data, ir.res=ir.res, ir.cohort=inc.cohort))
+}
+
+
+summary.dur <- function(d){
+  
+  df <- d %>% 
+    group_by(studyid, country, agecat) %>% 
+    summarize(mean=mean(wasting_duration, na.rm=T), var=var(wasting_duration, na.rm=T), n=n()) %>%
+    mutate(se=sqrt(var), ci.lb=mean - 1.96 * se, ci.ub=mean + 1.96 * se,
+           nmeas.f=paste0("N=",n," children")) %>% 
+    mutate(region = case_when(
+      country=="BANGLADESH" | country=="INDIA"|
+        country=="NEPAL" | country=="PAKISTAN"|
+        country=="PHILIPPINES"                   ~ "Asia", 
+      country=="BURKINA FASO"|
+        country=="GUINEA-BISSAU"|
+        country=="MALAWI"|
+        country=="KENYA"|
+        country=="GHANA"|
+        country=="SOUTH AFRICA"|
+        country=="TANZANIA, UNITED REPUBLIC OF"|
+        country=="ZIMBABWE"|
+        country=="GAMBIA"                       ~ "Africa",
+      country=="BELARUS"                      ~ "Europe",
+      country=="BRAZIL" | country=="GUATEMALA" |
+        country=="PERU"                         ~ "Latin America",
+      TRUE ~ "Other"
+    ),
+    country_cohort=paste0(studyid," ", country))
+    
+  
+  pooled.vel=lapply(list("0-3 months", "3-6 months",  "6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x) 
+    fit.cont.rma(data=df,yi="mean", vi="var", ni="n",age=x, nlab="children"))
+    pooled.vel=as.data.frame(do.call(rbind, pooled.vel))
+    pooled.vel$est <- as.numeric(pooled.vel$est)
+    pooled.vel <- pooled.vel %>% 
+    mutate(country_cohort="pooled", pooled=1, region="Overall") %>% 
+  subset(., select = -c(se)) %>%
+  rename(strata=agecat, Mean=est, N=nmeas, Lower.95.CI=lb, Upper.95.CI=ub)
+    
+     
+    cohort.df <- df %>% subset(., select = c(country_cohort, agecat, n, nmeas.f, mean, ci.lb, ci.ub, region)) %>%
+      rename(N=n, Mean=mean, Lower.95.CI=ci.lb, Upper.95.CI=ci.ub,
+             strata=agecat) %>%
+      mutate(pooled=0, nstudies=1)
+    
+  suppressWarnings(plotdf <- bind_rows(pooled.vel, cohort.df))
+  return(plotdf)
+}
+
 #----------------------------------------------
 # markt the start of wasted of not wasted episodes 
 #----------------------------------------------
@@ -248,6 +360,7 @@ sandwichSE <- function (dat, fm, cluster)
 #create function to calc unstrat and age stat incidence
 #----------------------------------------------
 WastIncCalc<-function(d, washout=60, dropBornWasted=F){
+ 
   require(tidyverse)
   require(zoo)  
   
@@ -262,15 +375,9 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   if(ndropped>0) cat("\n-----------------------------------\n",ndropped," observations dropped due to duplicate ages\n_----------------------------------\n")
   
   
-  #Create visit variable
-  #(This replaces the visit variables, but some studies have missing 
-  #visit data)
-  d <- d %>% group_by(subjid) %>% mutate(VISITNUM = rank(agedays))
-  
-  
   #Extract required columns and save others to merge back in later
-  othercolumns <- d %>% subset(., select= -c(whz, VISITNUM)) 
-  d <- d %>% subset(., select= c(subjid, whz, agedays, VISITNUM)) 
+  othercolumns <- d %>% subset(., select= -c(whz)) 
+  d <- d %>% subset(., select= c(subjid, whz, agedays)) 
   
   
   #generate wasting and severe wasting indicators
@@ -290,7 +397,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
       midpoint_age = agedays - (agedays - agelag)/2,
       wastchange = wast - lag(wast),
       sevwastchange = sevwast - lag(sevwast),
-      delta_age = agedays-agelag,
+      #delta_age = agedays-agelag,
       firstmeasure = agedays==min(agedays)
     ) %>%
     as.data.frame()
@@ -301,6 +408,8 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$wastchange[d$firstmeasure] <- d$wast[d$firstmeasure]
   d$sevwastchange[d$firstmeasure] <- d$sevwast[d$firstmeasure]
   d$midpoint_age[is.na(d$midpoint_age)] <- d$agedays[is.na(d$midpoint_age)]/2
+  d <- d %>% group_by(subjid) %>% mutate(lag_midpoint_age = lag(midpoint_age),
+                                         delta_age = midpoint_age-lag_midpoint_age)
   d$delta_age[d$firstmeasure] <-d$agedays[d$firstmeasure]
   
   #Length of each observation period
@@ -357,6 +466,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$wast_rec_inc <- d$sevwast_rec_inc <- d$wast_inc <- d$sevwast_inc <- rep(0, N)
   d$sevwast_rec_risk <- d$wast_rec_risk <- d$sevwast_risk <- d$wast_risk <-  rep(0, N)
   
+  d$past_wast_lag <- lag(d$past_wast)
   
   d$wast_inc[d$wastchange==1 & d$past_wast==0] <- 1 #Wasting incidence if at risk of wasting and change in status between prior and current observation
   d$wast_rec_inc[d$wastchange== -1 & d$future_wast==0] <- 1 #Recovery from wasting if status change to not wasted and no new wasting in the future washout period
@@ -366,7 +476,13 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   #Remove incidences of wasting if there has not been recovery from prior wasting episode
   #Is there a cleaner way of preventing recording the incidences earlier?
+  #In a few rare cases, recovery hasn't occured yet, but d$wastchange==1 & d$past_wast==0
+  #This happens if, for the first nonwasted measure after a series of wasted ones, the next
+  #wasting episode is within 60 days (so no recovery), but from that wasting episode, it looks
+  #like there has been 60 days without wasting (so incident episode), because the last wasted measure
+  #is beyond the 60 day period.
   table(d$wast_inc)
+  table(d$wast_rec_inc)
   
   d <- d %>% group_by(subjid) %>% 
     mutate(sum_wast_inc=cumsum(wast_inc),
@@ -374,59 +490,54 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   for(i in 1:nrow(d)){
     if(d$wast_inc[i]==1 & (d$sum_wast_inc[i]-d$sum_wast_rec[i] > 1)){
       d$wast_inc[i] <- 0 
+      d$past_wast[i] <- 1
       d <- d %>% group_by(subjid) %>% 
         mutate(sum_wast_inc=cumsum(wast_inc),
                sum_wast_rec=cumsum(wast_rec_inc))        
     }
     if(d$wast_rec_inc[i]==1 & (d$sum_wast_inc[i]-d$sum_wast_rec[i] < 0)){
       d$wast_rec_inc[i] <- 0 
+      d$future_wast[i] <- 1
       d <- d %>% group_by(subjid) %>% 
         mutate(sum_wast_inc=cumsum(wast_inc),
                sum_wast_rec=cumsum(wast_rec_inc))  
     }
   }
   table(d$wast_inc)
-  
+
   
   d <- subset(d, select = -c(sum_wast_inc,sum_wast_rec))
-  #Make sure there isn't double recovery
+
   #Indicate length of incident episodes
-  d$wasting_episode <- rep(NA, nrow(d))
-  d$wasting_episode[d$wast_inc==1] <- "Wasted"
-  d$wasting_episode[d$wast_rec_inc==1] <- "Not Wasted"
-  
-  
-  d <- d %>% group_by(subjid) %>%  arrange(agedays)
-  
-  #Have to mark first observations as wasted or not wasted if dropBornWasted=F
-  if(dropBornWasted==F){
+      d$wasting_episode <- rep(NA, nrow(d))
+      d$wasting_episode[d$wast_inc==1] <- "Wasted"
+      d$wasting_episode[d$wast_rec_inc==1] <- "Not Wasted"
+      d <- d %>% group_by(subjid) %>%  arrange(agedays)
+      
+      #Have to mark first observations as wasted or not wasted if dropBornWasted=F
+      if(dropBornWasted==F){
+        d <- d %>% group_by(subjid) %>%
+          do(mark_episodes(.))
+      }else{
+        d <- d %>% group_by(subjid) %>% 
+          mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
+                 wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Born Wasted", wasting_episode),
+                 wast_inc = ifelse(wasting_episode=="Born Wasted",0, wast_inc),
+                 born_wast_inc= ifelse(agedays==min(agedays) & wasting_episode=="Born Wasted",1,0),
+                 wasting_episode = na.locf(wasting_episode, fromLast=F)) %>% #Last observation carried forward 
+          ungroup()      
+      }
     
-    d <- d %>% group_by(subjid) %>%
-      do(mark_episodes(.))
-    
-    # d <- d %>% group_by(subjid) %>% 
-    #   mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
-    #          wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Wasted", wasting_episode),
-    #          born_wast_inc= 0,
-    #          wasting_episode = na.locf(wasting_episode, fromLast=F)) %>% #Last observation carried forward 
-    #   ungroup()
-  }else{
-    d <- d %>% group_by(subjid) %>% 
-      mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
-             wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Born Wasted", wasting_episode),
-             wast_inc = ifelse(wasting_episode=="Born Wasted",0, wast_inc),
-             born_wast_inc= ifelse(agedays==min(agedays) & wasting_episode=="Born Wasted",1,0),
-             wasting_episode = na.locf(wasting_episode, fromLast=F)) %>% #Last observation carried forward 
-      ungroup()      
-  }
-  
   #Indicate risk of wasting or recovery 
   d$wast_risk[(d$wasting_episode=="Not Wasted" & d$past_wast==0) | d$wast_inc==1] <- 1 
   d$wast_rec_risk[(d$wasting_episode!="Not Wasted" & d$wast_inc!=1) | d$wast_rec_inc==1] <- 1 
+  d$wast_refractory <-0
+  d$wast_refractory[(d$wasting_episode=="Not Wasted" & d$past_wast==1 & d$wast_rec_inc!=1)] <-1 
   
+  #Check that all obs fit in one category
+  table(d$wast_risk, d$wast_rec_risk, d$wast_refractory)
   
-  
-  #Calculate duration of wasting episodes
+  #Calculate duration of wasting and non-wasted episodes
   d <- d %>%  group_by(subjid) %>%
     mutate(episode_ID = cumsum(born_wast_inc+wast_inc+wast_rec_inc) + 1) %>% #Create unique episode ID
     ungroup() %>% group_by(subjid, episode_ID) %>%
@@ -575,12 +686,17 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   
   d$incident_time_into_period <- d$delta_age/2
+  #d$incident_time_into_period <- 0
   
   #calculate person time for each incidence outcome
-  d$pt_wast <- d$delta_age * d$wast_risk - d$incident_time_into_period * d$wast_inc
+  d$pt_wast <- d$delta_age * d$wast_risk - d$incident_time_into_period * d$wast_inc + d$incident_time_into_period * d$wast_rec_inc
   d$pt_sevwast <- d$delta_age * d$sevwast_risk - d$incident_time_into_period * d$sevwast_inc
-  d$pt_wast_rec <- d$delta_age * d$wast_rec_risk - d$incident_time_into_period * d$wast_rec_inc
+  d$pt_wast_rec <- d$delta_age * d$wast_rec_risk - d$incident_time_into_period * d$wast_rec_inc + d$incident_time_into_period * d$wast_inc
   d$pt_sevwast_rec <- d$delta_age * d$sevwast_rec_risk - d$incident_time_into_period * d$sevwast_rec_inc
+  d$pt_refractory <- d$delta_age * d$wast_refractory 
+  sum(d$pt_wast + d$pt_wast_rec + d$pt_refractory) #Should be 35800 in the test data.
+  
+  #df <- d %>% subset(., select=c(agedays, midpoint_age, pt_wast, pt_wast_rec, pt_refractory))
   
   #Drop intermediate variables
   d <- subset(d, select = -c(agelag, wastlag, sevwastlag, midpoint_age, wastchange, sevwastchange, past_wast, past_sevwast,
@@ -911,7 +1027,7 @@ fit.cont.rma=function(data,age,yi,vi,ni,nlab){
   
   data=filter(data,agecat==age)
   
-  fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML")
+  fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML", measure = "GEN")
   
   out = data %>%
     ungroup() %>%
