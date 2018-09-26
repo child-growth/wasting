@@ -81,6 +81,46 @@ summary.prev <- function(d){
 
 
 
+summary.whz <- function(d){
+  
+  # take mean of multiple measurements within age window
+  dmn <- d %>%
+    filter(!is.na(agecat)) %>%
+    group_by(studyid,country,subjid,agecat) %>%
+    summarise(whz=mean(whz))
+  
+  # count measurements per study by age
+  # exclude time points if number of measurements per age
+  # in a study is <50
+  whz.data = dmn %>%
+    filter(!is.na(agecat)) %>%
+    group_by(studyid,country,agecat) %>%
+    summarise(nmeas=sum(!is.na(whz)),
+              meanwhz=mean(whz),
+              varwhz=var(whz)) %>%
+    filter(nmeas>=50) 
+  
+  # cohort specific results
+  whz.cohort=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
+    fit.escalc.cont(data=whz.data,yi="meanwhz", vi="varwhz",age=x))
+  whz.cohort=as.data.frame(do.call(rbind, whz.cohort))
+  whz.cohort=cohort.format(whz.cohort,y=whz.cohort$yi,
+                           lab=  c("Birth","3m","6m","9m","12m","15m","18m","21m","24m"))
+  
+  # estimate random effects, format results
+  whz.res=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
+    fit.cont.rma(data=whz.data, ni="nmeas", yi="meanwhz", vi="varwhz", nlab="children",age=x))
+  whz.res=as.data.frame(do.call(rbind, whz.res))
+  whz.res[,4]=as.numeric(whz.res[,4])
+  whz.res$agecat=factor(whz.res$agecat,levels=c("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"))
+  whz.res$ptest.f=sprintf("%0.0f",whz.res$est)
+  
+  
+  return(list(whz.data=whz.data, whz.res=whz.res, whz.cohort=whz.cohort))
+}
+
+
+
 
 
 
@@ -719,6 +759,8 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   colnames(d) <- tolower(colnames(d))
   
+  d <- d %>% arrange(subjid, agedays)
+  
   return(d)
 }  
 
@@ -1050,6 +1092,8 @@ sem<-function(x){
 
 
 
+
+
 #---------------------------------------
 # fit.escalc function
 #---------------------------------------
@@ -1085,10 +1129,10 @@ fit.escalc <- function(data,age,ni,xi, meas){
 }
 
 
-fit.escalc.cont <- function(data,age,ni,xi, meas){
+fit.escalc.cont <- function(data,age,yi,vi, meas){
   data=filter(data,agecat==age)
   
-  data <- escalc(yi=data[[yi]], vi=data[[vi]], method="REML")
+  data <- escalc(yi=data[[yi]], vi=data[[vi]], method="REML", measure="GEN")
   
   data$se <- sqrt(data$vi)
   data$ci.lb <- data$yi - 1.96 * data$se 

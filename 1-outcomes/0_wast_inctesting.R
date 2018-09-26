@@ -5,14 +5,15 @@ rm(list=ls())
 source("C:/Users/andre/Documents/HBGDki/Wasting/1-outcomes/0_wast_incfunctions.R")
 
 
-load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata.Rdata")
+#load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata.Rdata")
+ load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata2.Rdata")
+ #load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata3.Rdata")
 #d <- d %>% filter(subjid==3)
 d$country <- "null"
 d$studyid <- "a"
 washout=60
 dropBornWasted=F
-# load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata2.Rdata")
-# load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata3.Rdata")
+
 
 # test <- WastIncCalc(d)
 # 
@@ -68,6 +69,9 @@ d <- d %>% group_by(studyid, country) %>% do(WastIncCalc(.))
 d <- calc.prev.agecat(d)
 prev.data <- summary.prev(d)
 
+#mean whz
+whz.data <- summary.whz(d)
+
 #Cumulative inc
 d <- calc.ci.agecat(d)
 ci.data <- summary.ci(d)
@@ -92,6 +96,6 @@ rec.ir.data <- summary.ir(d, recovery = T)
 dur.data <- summary.dur(d) 
 
 
-save(prev.data, ci.data, ci.data.nobirth, rec.data, ir.data, ir.data.nobirth, rec.ir.data, dur.data, file="C:/Users/andre/Documents/HBGDki/Results/Wasting_descriptive_epi_results.Rdata")
+save(prev.data, whz.data, ci.data, ci.data.nobirth, rec.data, ir.data, ir.data.nobirth, rec.ir.data, dur.data, file="C:/Users/andre/Documents/HBGDki/Results/Wasting_descriptive_epi_results.Rdata")
 
 

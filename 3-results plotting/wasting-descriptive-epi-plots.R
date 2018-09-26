@@ -109,7 +109,7 @@ ggsave(p2, file="pooled_CI.png", width=10, height=4)
 
 
 #-------------------------------------------------------------------------------------------
-# Cumulative Incidence
+# Cumulative Incidence - no birth
 #-------------------------------------------------------------------------------------------
 
 ci.res <- ci.data.nobirth$ci.res
@@ -179,10 +179,10 @@ df$nmeas.f <- paste0(round(df$nmeas/1000, 0),rep("K at-risk",8))
 df$agecat.f2 <- clean_agecat(df$agecat)
 
 
-p4 <- ggplot(df, aes(y=est,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
+p4 <- ggplot(df, aes(y=est*1000,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
   geom_point( size = 4, position=position_dodge(width=0.25)) +
-  geom_linerange(aes(ymin=lb, ymax=ub), alpha=0.5, size = 3) +
-  scale_y_continuous(limits=c(-2,10))+
+  geom_linerange(aes(ymin=lb*1000, ymax=ub*1000), alpha=0.5, size = 3) +
+  scale_y_continuous(limits=c(-2,100))+
   xlab("Age category") +
   ylab("Percent wasted (95% CI)") +
   annotate("text",x=df$agecat.f2,y=1,label=df$nmeas.f,size=3) +
@@ -210,10 +210,10 @@ df$nmeas.f <- paste0(round(df$nmeas/1000, 0),rep("K at-risk",8))
 df$agecat.f2 <- clean_agecat(df$agecat)
 
 
-p4_nobirth <- ggplot(df, aes(y=est,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
+p4_nobirth <- ggplot(df, aes(y=est*1000,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
   geom_point( size = 4, position=position_dodge(width=0.25)) +
-  geom_linerange(aes(ymin=lb, ymax=ub), alpha=0.5, size = 3) +
-  scale_y_continuous(limits=c(-2,10))+
+  geom_linerange(aes(ymin=lb*1000, ymax=ub*1000), alpha=0.5, size = 3) +
+  scale_y_continuous(limits=c(-2,100))+
   xlab("Age category") +
   ylab("Percent wasted (95% CI)") +
   annotate("text",x=df$agecat.f2,y=1,label=df$nmeas.f,size=3) +
@@ -239,15 +239,13 @@ ggsave(p4_nobirth, file="pooled_inc_rate_no_birth.png", width=10, height=4)
 # Duration
 #-------------------------------------------------------------------------------------------
 
-vel <- rbind(data.frame(measure="Length velocity (cm per month)" , poollencm[poollencm$stratacol=="pooled" & poollencm$region=="Overall",]),
-             data.frame(measure="LAZ change (Z-score per month)" , poolhaz[poolhaz$stratacol=="pooled" & poolhaz$region=="Overall",]))
+dur <- dur.data[dur.data$pooled==1,]
+
+dur$nmeas.f <- clean_nmeans(dur$N)
+dur$strata <- clean_agecat(dur$strata)
 
 
-vel$nmeas.f <- clean_nmeans(vel$N)
-vel$strata <- clean_agecat(vel$strata)
-
-
-p7 <- ggplot(vel, aes(y=Mean,x=strata))+
+p7 <- ggplot(dur, aes(y=Mean,x=strata))+
   geom_point(aes(fill=strata, color=strata), size = 4) +
   geom_linerange(aes(ymin=Lower.95.CI, ymax=Upper.95.CI, color=strata),
                  alpha=0.5, size = 3) +
@@ -256,14 +254,13 @@ p7 <- ggplot(vel, aes(y=Mean,x=strata))+
   #scale_y_continuous(limits=c(0,20))+
   # annotate("text",x=vel$strata,y=.12,label=vel$nmeas.f,size=3)+
   # annotate("text",x=vel$strata,y=0.1,label=vel$nstudy.f,size=3)+
-  facet_wrap(~measure, scales="free_y") +
   ggtitle("")+
   theme(strip.background = element_blank(),
         legend.position="none",
         strip.text.x = element_text(size=12),
         axis.text.x = element_text(size=12, angle = 25, hjust = 1)) 
-
-ggsave(p7, file="pooled_velocity.png", width=10, height=4)
+p7
+ggsave(p7, file="pooled_duration.png", width=10, height=4)
 
 
 
