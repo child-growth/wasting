@@ -12,7 +12,7 @@ load("C:/Users/andre/Dropbox/HBGDki replication/Mock data/testdata.Rdata")
 d$country <- "null"
 d$studyid <- "a"
 washout=60
-dropBornWasted=F
+dropBornWasted=T
 
 
 # test <- WastIncCalc(d)
