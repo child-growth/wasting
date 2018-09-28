@@ -18,9 +18,9 @@ calc.prev.agecat <- function(d){
                                          "12 months","15 months","18 months","21 months","24 months"))) 
 }
 
-calc.ci.agecat <- function(d){
+calc.ci.agecat <- function(d, range=3){
+  if(range==3){
   d = d %>% 
-    #filter(agedays>1) %>%
     mutate(agecat=ifelse(agedays<=3*30.4167,"0-3 months",
                          ifelse(agedays>3*30.4167 & agedays<=6*30.4167,"3-6 months",
                                 ifelse(agedays>6*30.4167 & agedays<=9*30.4167,"6-9 months",
@@ -30,6 +30,16 @@ calc.ci.agecat <- function(d){
                                                             ifelse(agedays>18*30.4167 & agedays<=21*30.4167,"18-21 months",
                                                                    ifelse(agedays>21*30.4167& agedays<=24*30.4167,"21-24 months",""))))))))) %>%
     mutate(agecat=factor(agecat,levels=c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")))
+  }
+  if(range==6){
+    d = d %>% 
+      mutate(agecat=ifelse(agedays<=6*30.4167,"0-6 months",
+                                         ifelse(agedays>6*30.4167 & agedays<=12*30.4167,"6-12 months",
+                                                       ifelse(agedays>12*30.4167 & agedays<=18*30.4167,"12-18 months",
+                                                                     ifelse(agedays>18*30.4167& agedays<=24*30.4167,"18-24 months",""))))) %>%
+      mutate(agecat=factor(agecat,levels=c("0-6 months","6-12 months","12-18 months","18-24 months")))
+  }
+  return(d)
 }
 
 
@@ -54,8 +64,7 @@ summary.prev <- function(d){
     summarise(nmeas=sum(!is.na(whz)),
               prev=mean(wasted),
               nxprev=sum(wasted==1)) %>%
-    filter(nmeas>=50) 
-  
+    filter(nmeas>=5) 
   
   # cohort specific results
   prev.cohort=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
@@ -75,8 +84,18 @@ summary.prev <- function(d){
   prev.res$ptest.f=sprintf("%0.0f",prev.res$est)
   
   
+  # estimate random effects in birth cohorts only
+  birthcohorts<-prev.data$studyid[prev.data$agecat=="Birth"]
+  prev.res.birthcohorts=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
+    fit.rma(data=prev.data[prev.data$studyid %in% birthcohorts, ],ni="nmeas", xi="nxprev",age=x,measure="PR",nlab="children"))
+  prev.res.birthcohorts=as.data.frame(do.call(rbind, prev.res.birthcohorts))
+  prev.res.birthcohorts[,4]=as.numeric(prev.res.birthcohorts[,4])
+  prev.res.birthcohorts = prev.res.birthcohorts %>%
+    mutate(est=est*100,lb=lb*100,ub=ub*100)
+  prev.res.birthcohorts$agecat=factor(prev.res.birthcohorts$agecat,levels=c("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"))
+  prev.res.birthcohorts$ptest.f=sprintf("%0.0f",prev.res.birthcohorts$est)
   
-  return(list(prev.data=prev.data, prev.res=prev.res, prev.cohort=prev.cohort))
+  return(list(prev.data=prev.data, prev.res=prev.res, prev.res.birthcohorts=prev.res.birthcohorts, prev.cohort=prev.cohort))
 }
 
 
@@ -98,7 +117,7 @@ summary.whz <- function(d){
     summarise(nmeas=sum(!is.na(whz)),
               meanwhz=mean(whz),
               varwhz=var(whz)) %>%
-    filter(nmeas>=50) 
+    filter(nmeas>=5) 
   
   # cohort specific results
   whz.cohort=lapply(list("Birth","3 months","6 months","9 months","12 months","15 months","18 months","21 months","24 months"),function(x) 
@@ -145,7 +164,7 @@ summary.ci <- function(d, recovery=F){
       nstudy=length(unique(studyid)),
       ncases=sum(ever_wasted),
       N=sum(length(ever_wasted))) %>%
-    filter(N>=50)
+    filter(N>=5)
   
   cuminc.data
   
@@ -171,13 +190,105 @@ summary.ci <- function(d, recovery=F){
 }
 
 
+summary.rec60 <- function(d, length=60, agelist=c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
+  
+  if(length==30){d$wast_inc <- d$wast_rec30d}
+  if(length==60){d$wast_inc <- d$wast_rec60d}
+  if(length==90){d$wast_inc <- d$wast_rec90d}
+  
+  
+  evs <- d %>%
+    group_by(studyid, country, agecat, subjid) %>%
+    filter(!is.na(agecat) & !is.na(wast_inc)) %>%
+    summarise(numwast = sum(wast_inc, na.rm=T)) %>%
+    mutate(ever_wasted = 1*(numwast>0))
+  
+  # count incident cases per study by age
+  # exclude time points if number of measurements per age
+  # in a study is <50  
+  cuminc.data= evs%>%
+    group_by(studyid,country,agecat) %>%
+    summarise(
+      nchild=length(unique(subjid)),
+      nstudy=length(unique(studyid)),
+      ncases=sum(ever_wasted),
+      N=sum(length(ever_wasted))) %>%
+    filter(N>=5)
+  
+  
+  
+  # cohort specific results
+  ci.cohort=lapply(as.list(agelist),function(x) 
+    fit.escalc(data=cuminc.data,ni="N", xi="ncases",age=x,meas="PR"))
+  ci.cohort=as.data.frame(do.call(rbind, ci.cohort))
+  ci.cohort=cohort.format(ci.cohort,y=ci.cohort$yi,
+                          lab=  c(agelist))
+  
+  # estimate random effects, format results
+  ci.res=lapply(as.list(agelist),function(x)
+    fit.rma(data=cuminc.data,ni="N", xi="ncases",age=x,measure="PR",nlab=" measurements"))
+  ci.res=as.data.frame(do.call(rbind, ci.res))
+  ci.res[,4]=as.numeric(ci.res[,4])
+  ci.res = ci.res %>%
+    mutate(est=est*100, lb=lb*100, ub=ub*100)
+  ci.res$ptest.f=sprintf("%0.0f",ci.res$est)
+  
+  
+  return(list(cuminc.data=cuminc.data, ci.res=ci.res, ci.cohort=ci.cohort))
+  
+}
 
+
+
+summary.perswast <- function(d, agelist=c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
+  
+
+  pers <- d %>%
+    group_by(studyid, country, agecat, subjid) %>%
+    filter(!is.na(agecat)) %>%
+    summarise(perc_wast = mean(whz < (-2))) %>%
+    mutate(pers_wast = 1*(perc_wast>=.5))
+  
+  # count incident cases per study by age
+  # exclude time points if number of measurements per age
+  # in a study is <50  
+  pers.data= pers %>%
+    group_by(studyid,country,agecat) %>%
+    summarise(
+      nchild=length(unique(subjid)),
+      nstudy=length(unique(studyid)),
+      ncases=sum(pers_wast),
+      N=sum(length(pers_wast))) %>%
+    filter(N>=5)
+  
+  
+  
+  # cohort specific results
+  pers.cohort=lapply(as.list(agelist),function(x) 
+    fit.escalc(data=pers.data,ni="N", xi="ncases",age=x,meas="PR"))
+  pers.cohort=as.data.frame(do.call(rbind, pers.cohort))
+  pers.cohort=cohort.format(pers.cohort,y=pers.cohort$yi,
+                          lab=  c(agelist))
+  
+  # estimate random effects, format results
+  pers.res=lapply(as.list(agelist),function(x)
+    fit.rma(data=pers.data,ni="N", xi="ncases",age=x,measure="PR",nlab=" measurements"))
+  pers.res=as.data.frame(do.call(rbind, pers.res))
+  pers.res[,4]=as.numeric(pers.res[,4])
+  pers.res = pers.res %>%
+    mutate(est=est*100, lb=lb*100, ub=ub*100)
+  pers.res$ptest.f=sprintf("%0.0f",pers.res$est)
+  
+  
+  return(list(pers.data=pers.data, pers.res=pers.res, pers.cohort=pers.cohort))
+  
+}
 
 
 summary.ir <- function(d, recovery=F){
   if(recovery==T){
     d$wast_inc <- d$wast_rec
-    d$pt_wast_rec <- d$pt_wast_rec
+    d$pt_wast <- d$pt_wast_rec
   }
   
   # manually calculate incident cases, person-time at risk at each time point
@@ -196,7 +307,7 @@ summary.ir <- function(d, recovery=F){
               ncase=sum(wast_inc, na.rm=T),
               nchild=length(unique(subjid)),
               nstudy=length(unique(studyid))) %>%
-    filter(nchild>=50)
+    filter(nchild>=5 & ptar>125 & !is.na(agecat))
   
   
   
@@ -221,7 +332,7 @@ summary.ir <- function(d, recovery=F){
                                                               country=="GAMBIA","Africa",
                                                             ifelse(country=="BELARUS","Europe",
                                                                    "Latin America"))))
-
+  
   
   # estimate random effects, format results
   ir.res=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x)
@@ -399,10 +510,10 @@ sandwichSE <- function (dat, fm, cluster)
 #create function to calc unstrat and age stat incidence
 #----------------------------------------------
 WastIncCalc<-function(d, washout=60, dropBornWasted=F){
- 
+  
   require(tidyverse)
   require(zoo)  
-
+  
   #Filter out extreme or missing whz values
   d <- d %>%  ungroup() %>% filter(!is.na(whz)) %>%
     filter(whz > (-5) & whz < 5)
@@ -446,7 +557,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   d$wastchange[d$firstmeasure] <- d$wast[d$firstmeasure]
   d$sevwastchange[d$firstmeasure] <- d$sevwast[d$firstmeasure]
   d$midpoint_age[is.na(d$midpoint_age)] <- d$agedays[is.na(d$midpoint_age)]/2
-   d <- d %>% group_by(subjid) %>% mutate(next_midpoint = lead(midpoint_age), last_midpoint = lag(midpoint_age))
+  d <- d %>% group_by(subjid) %>% mutate(next_midpoint = lead(midpoint_age), last_midpoint = lag(midpoint_age))
   #                                        delta_age = next_midpoint-midpoint_age)
   d$delta_age[d$firstmeasure] <-d$agedays[d$firstmeasure]
   
@@ -545,32 +656,32 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   #   }
   # }
   # table(d$wast_inc)
-
+  
   
   #d <- subset(d, select = -c(sum_wast_inc,sum_wast_rec))
-
-  #Indicate length of incident episodes
-      d$wasting_episode <- rep(NA, nrow(d))
-      d$wasting_episode[d$wast_inc==1] <- "Wasted"
-      d$wasting_episode[d$wast_rec_inc==1] <- "Not Wasted"
-      d <- d %>% group_by(subjid) %>%  arrange(subjid, agedays)
-      
-      #Have to mark first observations as wasted or not wasted if dropBornWasted=F
-      if(dropBornWasted==F){
-        d <- d %>% group_by(subjid) %>%
-          do(mark_episodes(.))
-      }else{
-        d <- d %>% group_by(subjid) %>% arrange(subjid, agedays) %>%
-          mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
-                 wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Born Wasted", wasting_episode),
-                 born_wast_inc= ifelse(agedays==min(agedays) & wasting_episode=="Born Wasted",1,0),
-                 wasting_episode = na.locf(wasting_episode, fromLast=F),  #Last observation carried forward 
-                 wast_inc = ifelse(wasting_episode=="Born Wasted",0, wast_inc)) %>%
-          ungroup() 
-      }
   
-
-    
+  #Indicate length of incident episodes
+  d$wasting_episode <- rep(NA, nrow(d))
+  d$wasting_episode[d$wast_inc==1] <- "Wasted"
+  d$wasting_episode[d$wast_rec_inc==1] <- "Not Wasted"
+  d <- d %>% group_by(subjid) %>%  arrange(subjid, agedays)
+  
+  #Have to mark first observations as wasted or not wasted if dropBornWasted=F
+  if(dropBornWasted==F){
+    d <- d %>% group_by(subjid) %>%
+      do(mark_episodes(.))
+  }else{
+    d <- d %>% group_by(subjid) %>% arrange(subjid, agedays) %>%
+      mutate(wasting_episode = ifelse(agedays==min(agedays) & wast==0, "Not Wasted", wasting_episode),
+             wasting_episode = ifelse(agedays==min(agedays) & wast==1, "Born Wasted", wasting_episode),
+             born_wast_inc= ifelse(agedays==min(agedays) & wasting_episode=="Born Wasted",1,0),
+             wasting_episode = na.locf(wasting_episode, fromLast=F),  #Last observation carried forward 
+             wast_inc = ifelse(wasting_episode=="Born Wasted",0, wast_inc)) %>%
+      ungroup() 
+  }
+  
+  
+  
   #Indicate risk of wasting or recovery 
   d$wast_risk[(d$wasting_episode=="Not Wasted" & d$past_wast==0) | d$wast_inc==1] <- 1 
   d$wast_rec_risk[(d$wasting_episode!="Not Wasted" & d$wast_inc!=1) | d$wast_rec_inc==1] <- 1 
@@ -776,6 +887,7 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   return(d)
 }  
+
 
 
 
@@ -1062,7 +1174,7 @@ fit.rma=function(data,age,ni,xi,measure,nlab){
              method="REML", measure=measure)
   }else{
     fit<-rma(ti=data[[ni]], xi=data[[xi]], 
-             method="REML", measure=measure)
+             method="REML", measure=measure, to="if0all")
   }
   out=data %>%
     ungroup() %>%
@@ -1073,6 +1185,8 @@ fit.rma=function(data,age,ni,xi,measure,nlab){
                           " ",nlab),
            nstudy.f=paste0("N=",nstudies," studies"))
   return(out)
+  
+  
 }
 
 

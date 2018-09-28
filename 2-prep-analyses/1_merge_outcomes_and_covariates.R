@@ -42,7 +42,6 @@ d <- left_join(cuminc, cov, by=c("studyid", "subjid", "country"))
 head(d)
 
 
-
 #Vector of outcome names
 Y<-c("ever_wasted")
 

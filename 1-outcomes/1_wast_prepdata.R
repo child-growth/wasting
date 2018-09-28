@@ -20,7 +20,7 @@ d<-fread("U:/data/FINAL/UCB Rally7/Main/adam/FINAL.csv", header = T)
 
 #change names to lower case
 colnames(d) <- tolower(colnames(d))
-d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, whz))
+d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, month, whz))
 
 #--------------------------------------------
 #Check for duplicate agedays
@@ -111,7 +111,7 @@ load("U:/data/compiled_WHZ_dataset.RData")
 # Subset to relevant variables
 #--------------------------------------------
 colnames(d)=tolower(colnames(d))
-d <- d %>% select(studyid, subjid, country, tr, agedays, whz, measurefreq)
+d <- d %>% select(studyid, subjid, country, tr, agedays, month, whz, measurefreq)
 
 nrow(d)
 
@@ -122,7 +122,7 @@ nrow(d)
 # drop unrealistic HAZ
 #--------------------------------------------
 nrow(d)
-d = filter(d, whz >= -6 & whz <=6)
+d = filter(d, whz >= -5 & whz <=5)
 nrow(d)
 
 #--------------------------------------------
@@ -143,6 +143,29 @@ table(d$studyid,d$country)
 
 #convert subjid to character for the merge with covariate dataset
 d$subjid <- as.character(d$subjid)
+
+
+#Add region variable
+#Add regions
+d <- d %>% mutate(region = case_when(
+  country=="BANGLADESH" | country=="INDIA"|
+    country=="NEPAL" | country=="PAKISTAN"|
+    country=="PHILIPPINES"                   ~ "Asia", 
+  country=="KENYA"|
+    country=="GHANA"|
+    country=="BURKINA FASO"|
+    country=="GUINEA-BISSAU"|
+    country=="MALAWI"|
+    country=="SOUTH AFRICA"|
+    country=="TANZANIA, UNITED REPUBLIC OF"|
+    country=="ZIMBABWE"|
+    country=="GAMBIA"                       ~ "Africa",
+  country=="BELARUS"                      ~ "Europe",
+  country=="BRAZIL" | country=="GUATEMALA" |
+    country=="PERU"                         ~ "Latin America",
+  TRUE                                    ~ "Other"
+))
+
 
 
 #--------------------------------------------
@@ -185,10 +208,10 @@ save(d,file="U:/Data/Wasting/Wasting_data.RData")
 #--------------------------------------------
 # plot HAZ by agedays for included studies
 #--------------------------------------------
-pdf("U:/Figures/whz-scatter-1a.pdf",width=15,height=15,onefile=TRUE)
-ggplot(d[d$agedays<=365*2,],aes(x=agedays,y=whz))+geom_point(alpha=0.3)+geom_smooth()+
-  facet_wrap(~studyid+country)+geom_hline(yintercept=-2,linetype="dashed",col="red")
-dev.off()
+# pdf("U:/Figures/whz-scatter-1a.pdf",width=15,height=15,onefile=TRUE)
+# ggplot(d[d$agedays<=365*2,],aes(x=agedays,y=whz))+geom_point(alpha=0.3)+geom_smooth()+
+#   facet_wrap(~studyid+country)+geom_hline(yintercept=-2,linetype="dashed",col="red")
+# dev.off()
 
 
 
