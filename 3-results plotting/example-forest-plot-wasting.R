@@ -297,7 +297,7 @@ d$RFlabel[d$intervention_variable=="lag_WHZ_quart"] <-  "Mean WHZ in the prior 3
 
 #order by Region
 d$Region <- as.character(d$Region)
-d$Region <- factor(d$Region, levels=c("Pooled","Asia", "Latin America","Africa","Europe"))
+d$Region <- factor(d$Region, levels=c("Pooled","Asia", "Africa","Latin America","Europe"))
 d <- d[with(d, order(desc(pooled), Region)),]
 unique(d$studyid)
 
@@ -392,6 +392,7 @@ tableau10 <- c("Black","#1F77B4","#FF7F0E","#2CA02C","#D62728",
   
   df$agecat <- "6-24 months cumulative incidence)"
   Ylab <- "Relative Risk of boys compared to girls"
+  Ylab <- "Girls have                           Boys have\nhigher risk                          higher risk"
   
   p <-  ggplot(df, aes(x=studyid)) + 
     #geom_point(aes(y=RR, fill=Region, color=Region), size = 4, shape= ifelse(df$pooled==1,5,6)) +
@@ -399,7 +400,8 @@ tableau10 <- c("Black","#1F77B4","#FF7F0E","#2CA02C","#D62728",
     geom_linerange(aes(ymin=RR.CI1, ymax=RR.CI2, color=Region)) +
     coord_flip(ylim=range(0.5,8)) +
     #labs(x = "Study-specific results stratified by risk factor level\nwith reference category N's and cases printed", y = Ylab) +
-    labs(x = "Cohort", y = Ylab) +
+    xlab("Cohort") +
+    ylab(Ylab) +
     geom_hline(yintercept = 1) +
     geom_vline(xintercept = 2.5, linetype=2) +
     geom_vline(xintercept = Npooled+0.5) +
@@ -414,8 +416,9 @@ tableau10 <- c("Black","#1F77B4","#FF7F0E","#2CA02C","#D62728",
     theme(strip.background = element_blank(),
           legend.position="none",
           strip.text.x = element_text(size=12),
-          axis.text.x = element_text(size=12, angle = 45, hjust = 1)) +
-    # facet_wrap(~intervention_level, ncol=1) +
+          axis.text.x = element_text(size=12, angle = 0, hjust = 1),
+          axis.title.x = element_text(size=12, hjust = .1)) +
+  # facet_wrap(~intervention_level, ncol=1) +
     # ggtitle(paste0("Risk factor: ", df$RFlabel[1], "\n",
     #                "Reference level: ", df$baseline_level[!is.na(df$baseline_level)], "\n", 
     #                "Outcome: ", df$agecat))
