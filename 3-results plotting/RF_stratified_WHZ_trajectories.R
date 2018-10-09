@@ -1,6 +1,8 @@
 
 rm(list=ls())
 library(tidyverse)
+library(directlabels)
+library(ggrepel)
 
 #Set theme
 theme_set(theme_bw())
@@ -86,6 +88,13 @@ d <- d %>% rename(
 
 d <- subset(d, select = -c(id))
 
+#Strip grant identifier and add country
+d$studyid <- gsub("^k.*?-" , "", d$studyid)
+d$studyid <- paste0(d$studyid, ", ", paste0(substring(as.character(d$country),1,1), tolower(substring(as.character(d$country),2))))
+d$studyid <- gsub("Tanzania, united republic of", "Tanzania", d$studyid)
+d$studyid <- gsub("africa", "Africa", d$studyid)
+
+
 
 pdf("U:/Figures/Risk Factor WLZ curves.pdf", height=8, width=12)
 for(i in 11:ncol(d)){
@@ -104,16 +113,6 @@ dev.off()
 
 
 #Cohort stratified
-#Strip grant identifier and add country
-d$studyid <- gsub("^k.*?-" , "", d$studyid)
-d$studyid <- paste0(d$studyid, ", ", paste0(substring(as.character(d$country),1,1), tolower(substring(as.character(d$country),2))))
-d$studyid <- gsub("Tanzania, united republic of", "Tanzania", d$studyid)
-d$studyid <- gsub("africa", "Africa", d$studyid)
-
-
-
-
-
 pdf("U:/Figures/Risk Factor WLZ curves-cohort stratified.pdf", height=12, width=12)
 for(i in 11:ncol(d)){
   df <- d[!is.na(d[,i]),]
@@ -166,44 +165,81 @@ df <- df %>% filter(region!="Europe")
 
 df$region <- factor(df$region , levels=c( "Asia","Africa","Latin America"))
 
-p<-ggplot(df[!is.na(df$region),], aes(x=agemonth, y=whz, group=region, color=region)) + 
-  #geom_smooth(method = 'gam', se = FALSE, formula= y ~ s(x, bs = "cs")) +
-  geom_smooth(method = 'loess',se = FALSE) +
+p<-ggplot(df[!is.na(df$region),], aes(x=agemonth, y=whz, group=region, color=region)) +
+  #geom_smooth(method = 'gam', se = FALSE, formula= y ~ s(x, bs = "cs"), size=2) +
+  geom_smooth(method = 'loess',se = FALSE, size=2) +
   scale_color_manual(values=rep(tableau10,2), name = paste0("Region"))+
-  xlab("Child age in months") + ylab("WLZ") + xlim(c(0,24)) +
+  xlab("Child age in months") + ylab("WLZ") + coord_cartesian(xlim=c(0,24), ylim = c(-1,1), expand=c(0,0)) +
+  scale_x_continuous(breaks=c(0,6,12,18,24)) +
   ggtitle("Region") + theme(axis.text.y = element_text(size=12), axis.text.x = element_text(size=12))
+
+
 
 ggsave(p, file="U:/Figures/Stunting Webinar/region_WLZ_trajectories.png", width = 9, height = 3.5)
 
 
 df$month<-as.numeric(df$`Month of measurement`)
-plotdf <- df[df$studyid=="GMS-Nepal, Nepal",]
-p<-ggplot(plotdf, aes(x=month, y=whz,  color=region)) + 
-  #geom_smooth(method = 'gam', se = FALSE, formula= y ~ s(x, bs = "cs")) +
-  geom_smooth(method = 'loess',se = FALSE, size=2) +
-  #geom_smooth() +
-  scale_color_manual(values=rep(tableau10[2],2))+
-  xlab("Month of measurement") + ylab("WLZ") + #
-  ggtitle("WLZ over season in GMS-Nepal cohort") + theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12)) 
-p
+monthlabs <- c("Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "", "", "", "")
 
-ggsave(p, file="U:/Figures/Stunting Webinar/gmsn_season_WLZ_trajectories.png", width = 6, height = 3.5)
-
+# plotdf <- df[df$studyid=="ki1000108-CMC-V-BCS-2002",]
+# p<-ggplot(plotdf, aes(x=month, y=whz,  color=region)) + 
+#   #geom_smooth(method = 'gam', se = FALSE, size=2, formula= y ~ s(x, bs = "cs")) +
+#   coord_cartesian(ylim=c(0,-1.35)) +
+#   scale_x_continuous(breaks=c(1:12), labels= monthlabs, expand=c(0,0)) +
+#   scale_y_continuous(expand=c(0,0)) +
+#   geom_smooth(method = 'loess',se = FALSE, size=2) +
+#   scale_color_manual(values=rep(tableau10[2],2))+
+#   xlab("Month of measurement") + ylab("WLZ") + #
+#   ggtitle("WLZ over season in the CMC Vellore, India, cohort") + theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12)) 
+# p
+# 
+# ggsave(p, file="U:/Figures/Stunting Webinar/cmc_season_WLZ_trajectories.png", width = 6, height = 5.2)
+# 
 
 
 df$countrycohort<-paste0(df$studyid,df$country)
 
+plotdf <- df[df$region=="Asia",]
+plotdf$highlight <- 1
+#plotdf$highlight[plotdf$studyid=="ki1000108-CMC-V-BCS-2002"] <- 2
 
-p_asia<-ggplot(df[df$region=="Asia",], aes(x=month, y=whz, group=countrycohort, color=countrycohort)) + 
-  #geom_smooth(method = 'gam', se = FALSE, formula= y ~ s(x, bs = "cs")) +
-  geom_smooth(method = 'loess',se = FALSE, alpha=0.5) +
-  scale_color_manual(values=rep(tableau10,2))+
+plotdf <- plotdf %>% rename(Month=month)
+plotdf$studyid[plotdf$studyid=="GMS-Nepal, Nepal"] <- "GMS-Nepal"
+plotdf$studyid[plotdf$studyid=="CMC-V-BCS-2002, India"] <- "CMC, India"
+plotdf$studyid <- gsub("Bangladesh","BD",plotdf$studyid)
+
+
+p_asia<-ggplot(plotdf, aes(x=Month, y=whz, group=factor(studyid), color=factor(studyid))) + 
+  #geom_smooth(aes(size=highlight, linetype=factor(2-highlight)), method = 'gam', se = FALSE, formula= y ~ s(x, bs = "cs")) +
+  geom_smooth(method = 'loess',se = FALSE) +
+  coord_cartesian(ylim=c(0,-1.35), xlim=c(1,15)) +
+  scale_x_continuous(breaks=c(1:15), labels= monthlabs, expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0)) +
+  scale_color_manual(values=rep(tableau10[c(1,3,4,2,5:10)],20),name = "Cohort") +
+  scale_size(range=c(1, 2), guide=FALSE) +
   xlab("Month of measurement") + ylab("WLZ") + 
-  ggtitle("WLZ over season in Asian cohorts") + 
-  theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12))
-p_asia
+  ggtitle("Example: WLZ over season in South Asian cohorts") + 
+  theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12)) 
+  #geom_dl(aes(label = studyid), method = list("angled.boxes"))
+  #geom_dl(aes(label = studyid), method = list("last.qp"), inherit.aes=T) +
+  #geom_dl(label=as.factor(plotdf$studyid), method="maxvar.points", inherit.aes=T)
 
-ggsave(p_asia, file="U:/Figures/Stunting Webinar/season_WLZ_trajectories.png", width = 6, height = 3.5)
+
+
+library(data.table)
+smooth_dat <- setDT(ggplot_build(p_asia)$data[[1]])
+smooth_lab <- smooth_dat[smooth_dat[, .I[x == max(x)], by=group]$V1]
+smooth_lab$label <- levels(factor(plotdf$studyid))
+#smooth_lab$y[6] <- 
+
+p_asia <- p_asia + annotate("text", x = smooth_lab$x, y=smooth_lab$y, 
+             label=smooth_lab$label, colour=smooth_lab$colour,
+             hjust=-0.05)
+
+
+
+ggsave(p_asia, file="U:/Figures/Stunting Webinar/season_WLZ_trajectories.png", width = 6, height = 5.2)
+
 
 
 

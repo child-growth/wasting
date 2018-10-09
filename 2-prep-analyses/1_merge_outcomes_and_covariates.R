@@ -9,10 +9,14 @@ library(reshape2)
 
 #merge outcomes with covariates
 
-setwd("U:/ucb-superlearner/Wasting rallies/")
+setwd("U:/UCB-SuperLearner/Wasting rallies/")
 
 #load covariates
 cov<-readRDS("U:/ucb-superlearner/stunting rallies/FINAL_clean_covariates.rds")
+
+#Drop wasting risk factors
+cov <- cov %>% subset(., select=-c(pers_wast, enwast, anywast06))
+
 
 #load outcomes
 load("wast_prev.RData")
@@ -20,6 +24,7 @@ load("wast_cuminc.rdata")
 load("wast_cuminc_nobirth.rdata")
 load("pers_wast.rdata")
 load("wast_rec.rdata")
+load("birthanthro_cuminc.rdata")
 
 
 #convert subjid to character for the merge with covariate dataset
@@ -29,6 +34,7 @@ cuminc$subjid <- as.character(cuminc$subjid)
 cuminc_nobirth$subjid <- as.character(cuminc_nobirth$subjid)
 rec$subjid <- as.character(rec$subjid)
 pers_wast$subjid <- as.character(pers_wast$subjid)
+birthanthro_ci$subjid <- as.character(birthanthro_ci$subjid)
 
 
 
@@ -37,7 +43,6 @@ pers_wast$subjid <- as.character(pers_wast$subjid)
 #------------------------------------
 
 #merge in covariates
-cuminc <- cuminc %>% subset(., select = -c(tr))
 d <- left_join(cuminc, cov, by=c("studyid", "subjid", "country"))
 head(d)
 
@@ -73,7 +78,6 @@ save(d, Y, A,V, id,  file="wast_cuminc_rf.Rdata")
 #------------------------------------
 
 #merge in covariates
-cuminc_nobirth <- cuminc_nobirth %>% subset(., select = -c(tr))
 cuminc_nobirth <- bind_rows(cuminc_nobirth, cuminc[cuminc$agecat=="6-24 months",])
 
 d <- left_join(cuminc_nobirth, cov, by=c("studyid", "subjid", "country"))
@@ -185,9 +189,27 @@ A<-c( "sex",              "gagebrth",      "birthwt",
       "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
       "perdiar6", "perdiar24", "predexfd6", 
       "predfeed3", "exclfeed3", "predfeed6", "exclfeed6", "predfeed36", "exclfeed36",
-      "earlybf")  
+      "earlybf") 
 
-save(d, Y, A,V, id,  file="pers_wast_rf.Rdata")
+
+save(d, Y, A,V, id, file="pers_wast_rf.Rdata")
+
+#------------------------------------
+# Create birth anthro dataset
+#------------------------------------
+
+#merge in covariates
+d <- left_join(birthanthro_ci, cov, by=c("studyid", "subjid", "country"))
+head(d)
+
+
+#Vector of outcome names
+Y<-c("ever_wasted", "ever_stunted")
+A<-c("born_wasted", "born_stunted")  
+
+save(d, Y, A,V, id,  file="birthanthro_rf.Rdata")
+
+
 
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

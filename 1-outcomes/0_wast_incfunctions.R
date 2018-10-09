@@ -46,7 +46,7 @@ calc.ci.agecat <- function(d, range=3){
 
 
 
-summary.prev <- function(d){
+summary.prev <- function(d, severe.wasted=F){
   
   # take mean of multiple measurements within age window
   dmn <- d %>%
@@ -54,6 +54,10 @@ summary.prev <- function(d){
     group_by(studyid,country,subjid,agecat) %>%
     summarise(whz=mean(whz)) %>%
     mutate(wasted=ifelse(whz< -2, 1,0),swasted=ifelse(whz< -3, 1,0))
+  
+  if(severe.wasted==T){
+    dmn$wasted <- dmn$swasted
+  }
   
   # count measurements per study by age
   # exclude time points if number of measurements per age
@@ -142,14 +146,14 @@ summary.whz <- function(d){
 
 
 
-summary.ci <- function(d, recovery=F){
+summary.ci <- function(d, recovery=F, agelist=list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
   
   if(recovery==T){
     d$wast_inc <- d$wast_rec
   }
   
   evs <- d %>%
-  group_by(studyid, country, agecat, subjid) %>%
+    group_by(studyid, country, agecat, subjid) %>%
     filter(!is.na(agecat)) %>%
     summarise(numwast = sum(wast_inc, na.rm=T)) %>%
     mutate(ever_wasted = 1*(numwast>0))
@@ -169,26 +173,24 @@ summary.ci <- function(d, recovery=F){
   cuminc.data
   
   # cohort specific results
-  ci.cohort=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x) 
+  ci.cohort=lapply((agelist),function(x) 
     fit.escalc(data=cuminc.data,ni="N", xi="ncases",age=x,meas="PR"))
-  ci.cohort=as.data.frame(do.call(rbind, ci.cohort))
-  ci.cohort=cohort.format(ci.cohort,y=ci.cohort$yi,
-                          lab=  c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"))
-  
-  # estimate random effects, format results
-  ci.res=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x)
-    fit.rma(data=cuminc.data,ni="N", xi="ncases",age=x,measure="PR",nlab=" measurements"))
-  ci.res=as.data.frame(do.call(rbind, ci.res))
-  ci.res[,4]=as.numeric(ci.res[,4])
-  ci.res = ci.res %>%
-    mutate(est=est*100, lb=lb*100, ub=ub*100)
-  ci.res$ptest.f=sprintf("%0.0f",ci.res$est)
-  
-  
-  return(list(cuminc.data=cuminc.data, ci.res=ci.res, ci.cohort=ci.cohort))
-  
-}
+ci.cohort=as.data.frame(do.call(rbind, ci.cohort))
+ci.cohort=cohort.format(ci.cohort,y=ci.cohort$yi,
+                        lab=  agelist)
 
+# estimate random effects, format results
+ci.res=lapply(list(agelist),function(x)
+  fit.rma(data=cuminc.data,ni="N", xi="ncases",age=x,measure="PR",nlab=" measurements"))
+ci.res=as.data.frame(do.call(rbind, ci.res))
+ci.res[,4]=as.numeric(ci.res[,4])
+ci.res = ci.res %>%
+  mutate(est=est*100, lb=lb*100, ub=ub*100)
+ci.res$ptest.f=sprintf("%0.0f",ci.res$est)
+
+
+return(list(cuminc.data=cuminc.data, ci.res=ci.res, ci.cohort=ci.cohort))
+}
 
 summary.rec60 <- function(d, length=60, agelist=c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
   
@@ -285,7 +287,7 @@ summary.perswast <- function(d, agelist=c("0-3 months","3-6 months","6-9 months"
 }
 
 
-summary.ir <- function(d, recovery=F){
+summary.ir <- function(d, recovery=F, agelist=list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
   if(recovery==T){
     d$wast_inc <- d$wast_rec
     d$pt_wast <- d$pt_wast_rec
@@ -313,11 +315,11 @@ summary.ir <- function(d, recovery=F){
   
   
   # cohort specific results
-  inc.cohort=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x) 
+  inc.cohort=lapply((agelist),function(x) 
     fit.escalc(data=inc.data,ni="ptar", xi="ncase",age=x,meas="IR"))
   inc.cohort=as.data.frame(do.call(rbind, inc.cohort))
   inc.cohort$agecat=factor(inc.cohort$agecat,levels=
-                             c("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"))
+                             c(agelist))
   inc.cohort$yi.f=sprintf("%0.0f",inc.cohort$yi)
   inc.cohort$cohort=paste0(inc.cohort$studyid,"-",inc.cohort$country)
   inc.cohort = inc.cohort %>% mutate(region = ifelse(country=="BANGLADESH" | country=="INDIA"|
@@ -335,7 +337,7 @@ summary.ir <- function(d, recovery=F){
   
   
   # estimate random effects, format results
-  ir.res=lapply(list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x)
+  ir.res=lapply(list(agelist),function(x)
     fit.rma(data=inc.data,ni="ptar", xi="ncase",age=x,measure="IR",nlab=" person-days"))
   ir.res=as.data.frame(do.call(rbind, ir.res))
   ir.res[,4]=as.numeric(ir.res[,4])
@@ -869,10 +871,10 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
                              incident_time_into_period, delta_age
   )) %>%
     ungroup() %>% as.data.frame()
-  if(dropBornWasted==T){
-    d <- subset(d, select = -c(born_wast_inc, born_sevwast_inc)) %>%
-      ungroup() %>% as.data.frame()      
-  }
+  # if(dropBornWasted==T){
+  #   d <- subset(d, select = -c(born_wast_inc, born_sevwast_inc)) %>%
+  #     ungroup() %>% as.data.frame()      
+  # }
   
   #merge back in other columns
   d <- merge(d, othercolumns, by=c("subjid", "agedays"))

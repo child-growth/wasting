@@ -20,7 +20,7 @@ d<-fread("U:/data/FINAL/UCB Rally7/Main/adam/FINAL.csv", header = T)
 
 #change names to lower case
 colnames(d) <- tolower(colnames(d))
-d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, month, whz))
+d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, month, whz, haz))
 
 #--------------------------------------------
 #Check for duplicate agedays
@@ -111,7 +111,7 @@ load("U:/data/compiled_WHZ_dataset.RData")
 # Subset to relevant variables
 #--------------------------------------------
 colnames(d)=tolower(colnames(d))
-d <- d %>% select(studyid, subjid, country, tr, agedays, month, whz, measurefreq)
+d <- d %>% select(studyid, subjid, country, tr, agedays, month, whz, haz, measurefreq)
 
 nrow(d)
 
@@ -124,6 +124,7 @@ nrow(d)
 nrow(d)
 d = filter(d, whz >= -5 & whz <=5)
 nrow(d)
+#827876
 
 #--------------------------------------------
 # order data, create measurement id
