@@ -206,7 +206,7 @@ p4 <- ggplot(df, aes(y=est*1000,x=agecat.f2, fill=agecat.f2, color=agecat.f2))+
   geom_linerange(aes(ymin=lb*1000, ymax=ub*1000), alpha=0.5, size = 3) +
   scale_y_continuous(limits=c(-0.25,5))+
   xlab("Age category") +
-  ylab("IR per 1000 person-days") +
+  ylab("Episodes per 1000 person-days at risk") +
   annotate("text",x=df$agecat.f2,y=-0.25,label=df$nmeas.f,size=3) +
   annotate("text",x=df$agecat.f2,y=0,label=df$nstudy.f,size=3) +
   annotate("text",label=df$ptest.f,x=df$agecat.f2, y=df$est*1000,hjust=-2,size=3)+
@@ -272,7 +272,7 @@ ggsave(p4_nobirth, file="pooled_inc_rate_no_birth.png", width=10, height=4)
 
 
 #-------------------------------------------------------------------------------------------
-# Mean LAZ
+# Mean WLZ
 #-------------------------------------------------------------------------------------------
 
 # clean_nmeans<-function(nmeas){

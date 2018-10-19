@@ -37,7 +37,7 @@ missing
 #Subset to primary outcomes
 table(d$agecat)
 
-d <- d %>% filter(agecat=="6-24 months"| agecat=="0-24 months (no birth wast"| agecat=="0-24 months")
+d <- d %>% filter(agecat=="6-24 months"| agecat=="0-24 months (no birth wast)"| agecat=="0-24 months")
 
 
 #Drop enrolled wasted as a RF for wasting
@@ -73,9 +73,6 @@ RMAest$RFlabel[RMAest$RFlabel=="Exclusive or Predominant breastfeeding under 6 m
 
 RMAest$intervention_variable <- factor(RMAest$intervention_variable)
 
-#Add the reference level to the RFlabel
-#RMAest$RFlabel <- paste0(RMAest$RFlabel," (Ref:",RMAest$baseline,")")
-
 
 d <- RMAest
 
@@ -83,19 +80,19 @@ d <- RMAest
 
 #Set order of RF categories
 unique(d$RFtype)
-d$RFtype <- factor(d$RFtype , levels=c("Parent", "Parent\nanthro", "Birth", "Child", "Breast-\nfeeding", "SES", "House-\nhold", "WASH"))         
+d$RFtype <- factor(d$RFtype , levels=c("Parent background",  "Parent anthro", "Birth characteristics" , "Postnatal child health", "Breastfeeding","SES", "Household","WASH"))      
 d <- d %>% arrange(RFtype)
 
-#Maybe make heatmap with 4 columns, leave blank if less than 4 levels, and color grey for reference level.
-#Print the name of the category in the box?
+
 
 RMAestfull <- d %>% group_by(agecat, intervention_variable) %>% arrange(intervention_level) %>% 
   mutate(order=row_number()+1) %>% as.data.frame()
 
 
 #Subset to outcome and agecat of interest
-groups024 <- c("Parent","Parent\nanthro","Birth","SES","House-\nhold","Child")  
-groups624 <- c("Child","Breast-\nfeeding","WASH")
+groups024 <- c("Parent background",  "Parent anthro", "Birth characteristics" ,"SES","Household", "Postnatal child health")  
+groups624 <- c("Postnatal child health","Breastfeeding","WASH")
+
 
 
 #Subset to outcome and agecat of interest
@@ -122,7 +119,7 @@ label_wrap <- function(variable, value){
          paste, collapse="\n")
 }  
 
-yticks <- c(2/3, 1, 3/2,2,3,4)
+yticks <- c(0.5, 2/3, 1, 3/2,2,3,4)
 
 
 
@@ -171,7 +168,7 @@ ggsave(p, file="pers_wasting_pres_RFplot1.png",  width=6, height=6)
 
 
 
-vars <- c("meducyrs","hhwealth_quart","hfoodsec","parity")
+vars <- c("meducyrs","hhwealth_quart","parity")
 
 
 df <- RMAestfull %>% filter(intervention_variable %in% vars)

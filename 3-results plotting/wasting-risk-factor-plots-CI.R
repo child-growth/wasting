@@ -360,15 +360,13 @@ df$contrast <- factor(df$contrast )
 
 df <- droplevels(df)
 
-df$intervention_variable <- factor(df$intervention_variable, levels=c("meducyrs",
+df$intervention_variable <- factor(df$intervention_variable, levels=c("gagebrth", "meducyrs",
                                                                       "mage",
-                                                                      "mbmi",
                                                                       "hhwealth_quart",
                                                                       "hfoodsec",
-                                                                      "gagebrth",
-                                                                      "parity"))
-df <- df %>% arrange(intervention_variable)
-df$RFlabel <- factor(df$RFlabel, levels=unique(df$RFlabel))
+                                                                      "parity", "mbmi"))
+df <- df %>% arrange(intervention_variable, agecat)
+df$contrast <- factor(as.character(df$contrast), levels=unique(as.character(df$contrast)))
 
 
 yticks <- c(2/3, 1, 3/2)

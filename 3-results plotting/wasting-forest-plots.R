@@ -4,8 +4,10 @@ rm(list=ls())
 library(tidyverse)
 library(metafor)
 
-load("C:/Users/andre/Downloads/sprint_7D_longbow-master (2)/sprint_7D_longbow-master/adjusted_binary/adjusted_binary_results.rdata")
-load("C:/Users/andre/Downloads/RiskFactor_Ns.rdata")
+source("C:/Users/andre/Documents/HBGDki/GHAP-Data-Management/HBGDki_shared_functions.R")
+load("C:/Users/andre/Documents/HBGDki/Results/wasting_results.rdata")
+load("C:/Users/andre/Documents/HBGDki/Results/wast_RiskFactor_Ns.Rdata")
+
 
 d <- results
 

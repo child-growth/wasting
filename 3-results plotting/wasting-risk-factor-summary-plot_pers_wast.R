@@ -93,7 +93,7 @@ relevel_RF <- function(d, reference, variable){
   return(d)
 }
 
-
+unique(d$intervention_level)
 d <- relevel_RF(d, variable="fage", reference="<32")  
 d <- relevel_RF(d, variable="feducyrs", reference="High")
 d <- relevel_RF(d, variable="fhtcm", reference=">=167 cm")
@@ -107,7 +107,7 @@ d <- relevel_RF(d, variable="mage", reference="<25")
 d <- relevel_RF(d, variable="mbmi", reference="Overweight or Obese")   
 d <- relevel_RF(d, variable="meducyrs", reference="High")
 d <- relevel_RF(d, variable="mhtcm", reference=">=155 cm")    
-d <- relevel_RF(d, variable="mwtkg", reference="Normal weight")
+d <- relevel_RF(d, variable="mwtkg", reference=">=58 kg")
 d <- relevel_RF(d, variable="nchldlt5", reference="2+")
 d <- relevel_RF(d, variable="nhh", reference="3 or less")  
 d <- relevel_RF(d, variable="nrooms", reference="4+")
@@ -121,9 +121,11 @@ d <- relevel_RF(d, variable="earlybf", reference="Yes")
 d <- relevel_RF(d, variable="safeh20", reference="Yes")
 d <- relevel_RF(d, variable="sex", reference="Female")
 d <- relevel_RF(d, variable="single", reference="No") 
-d <- relevel_RF(d, variable="trth2o", reference="No")    
+d <- relevel_RF(d, variable="trth2o", reference="Yes")    
 d <- relevel_RF(d, variable="vagbrth", reference="No")
 d <- relevel_RF(d, variable="cleanck", reference="Yes")
+d <- relevel_RF(d, variable="birthwt", reference=">= 2500 g")
+d <- relevel_RF(d, variable="birthlen", reference=">=50 cm")
 d$RR2[is.na(d$RR2)] <- d$RR[is.na(d$RR2)] 
 
 
@@ -237,8 +239,8 @@ hm1 <- hm + aes(fill=RR2) +
 
 hm2 <- hm + aes(fill=RRcat) +
   labs(x="Exposure level",y="",title=plottitle) + theme(legend.position="nont") +
-  scale_fill_viridis_d(na.value="grey80") + labs(fill="Relative Risk")
-hm2 + geom_label(aes(label=paste0(intervention_level," RR:",round(RR2,2))), color="grey20", fill="white")
+  scale_fill_viridis_d(na.value="grey80", drop=F) + labs(fill="Relative Risk")
+#hm2 + geom_label(aes(label=paste0(intervention_level," RR:",round(RR2,2))), color="grey20", fill="white")
 
 
 setwd("C:/Users/andre/Dropbox/HBGDki figures/Berlin wasting figures")
@@ -269,7 +271,7 @@ hm3 <- ggplot(RMAestfull,aes(x=order,y=RFlabel)) +
     strip.text.x = element_text(size=12),
     strip.text.y = element_text(angle=0,size=14),
     plot.background=element_blank())  + aes(fill=RRcat) +
-  labs(x="Exposure level",y="",title=plottitle) + theme(legend.position="nont") +
+  labs(x="Exposure level",y="",title=plottitle) + theme(legend.position="none") +
   scale_fill_viridis_d(na.value="grey80") + labs(fill="Relative Risk") #+ geom_text(aes(label=paste0(intervention_level,"\nRR:",round(RR2,2))))
 hm3
 
@@ -307,7 +309,7 @@ hm <- ggplot(RMAestfull_sig,aes(x=order,y=RFlabel)) +
 
 hm4 <- hm + aes(fill=RRcat) +
   labs(x="Exposure level",y="",title=plottitle) + theme(legend.position="nont") +
-  scale_fill_viridis_d(na.value="grey80") + labs(fill="Relative Risk") 
+  scale_fill_viridis_d(na.value="grey80", drop=F) + labs(fill="Relative Risk") 
 #geom_text(aes(label=paste0(intervention_level,"\nRR:",round(RR2,2))))  
 
 
