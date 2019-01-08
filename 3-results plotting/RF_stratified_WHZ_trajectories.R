@@ -3,6 +3,7 @@ rm(list=ls())
 library(tidyverse)
 library(directlabels)
 library(ggrepel)
+library(grid)
 
 #Set theme
 theme_set(theme_bw())
@@ -180,6 +181,7 @@ ggsave(p, file="U:/Figures/Stunting Webinar/region_WLZ_trajectories.png", width 
 
 df$month<-as.numeric(df$`Month of measurement`)
 monthlabs <- c("Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "", "", "", "")
+monthlabs <- c("Jan", "", "Mar", "", "May", "", "Jul", "", "Sep", "", "Nov", "")
 
 # plotdf <- df[df$studyid=="ki1000108-CMC-V-BCS-2002",]
 # p<-ggplot(plotdf, aes(x=month, y=whz,  color=region)) + 
@@ -212,14 +214,15 @@ plotdf$studyid <- gsub("Bangladesh","BD",plotdf$studyid)
 p_asia<-ggplot(plotdf, aes(x=Month, y=whz, group=factor(studyid), color=factor(studyid))) + 
   #geom_smooth(aes(size=highlight, linetype=factor(2-highlight)), method = 'gam', se = FALSE, formula= y ~ s(x, bs = "cs")) +
   geom_smooth(method = 'loess',se = FALSE) +
-  coord_cartesian(ylim=c(0,-1.35), xlim=c(1,15)) +
-  scale_x_continuous(breaks=c(1:15), labels= monthlabs, expand=c(0,0)) +
+  coord_cartesian(ylim=c(0,-1.35), xlim=c(1,12)) +
+  scale_x_continuous(breaks=c(1:12), labels= monthlabs, expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0)) +
   scale_color_manual(values=rep(tableau10[c(1,3,4,2,5:10)],20),name = "Cohort") +
   scale_size(range=c(1, 2), guide=FALSE) +
   xlab("Month of measurement") + ylab("WLZ") + 
   ggtitle("Example: WLZ over season in South Asian cohorts") + 
-  theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12)) 
+  theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12),
+        plot.margin = unit(c(1,6,1,1), "lines")) 
   #geom_dl(aes(label = studyid), method = list("angled.boxes"))
   #geom_dl(aes(label = studyid), method = list("last.qp"), inherit.aes=T) +
   #geom_dl(label=as.factor(plotdf$studyid), method="maxvar.points", inherit.aes=T)
@@ -236,9 +239,13 @@ p_asia <- p_asia + annotate("text", x = smooth_lab$x, y=smooth_lab$y,
              label=smooth_lab$label, colour=smooth_lab$colour,
              hjust=-0.05)
 
+# Code to turn off clipping
+gt1 <- ggplotGrob(p_asia)
+gt1$layout$clip[gt1$layout$name == "panel"] <- "off"
+grid.draw(gt1)
 
 
-ggsave(p_asia, file="U:/Figures/Stunting Webinar/season_WLZ_trajectories.png", width = 6, height = 5.2)
+ggsave(gt1, file="U:/Figures/Stunting Webinar/season_WLZ_trajectories.png", width = 6, height = 5.2)
 
 
 

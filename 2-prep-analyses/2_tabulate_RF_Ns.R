@@ -8,17 +8,18 @@ library(reshape2)
 #merge outcomes with covariates
 
 # setwd("U:/UCB-SuperLearner/Stunting rallies/")
-setwd("U:/ucb-superlearner/Stunting rallies/")
+setwd("U:/UCB-SuperLearner/Wasting rallies/")
 
 #load covariates
-cov<-readRDS("FINAL_clean_covariates.rds")
+cov<-readRDS("U:/ucb-superlearner/stunting rallies/FINAL_clean_covariates.rds")
 
 #load outcomes
-load("st_prev_rf_outcomes.rdata")
-load("st_cuminc_rf_outcomes.rdata")
-load("st_rec_rf_outcomes.rdata")
-load("st_vel_rf_outcomes.rdata")
-
+#load outcomes
+load("wast_prev.RData")
+load("wast_cuminc.rdata")
+load("wast_cuminc_nobirth.rdata")
+load("pers_wast.rdata")
+load("wast_rec.rdata")
 
 dim(prev)
 dim(cuminc)
@@ -42,8 +43,7 @@ cov$subjid <- as.character(cov$subjid)
 prev$subjid <- as.character(prev$subjid)
 cuminc$subjid <- as.character(cuminc$subjid)
 rev$subjid <- as.character(rev$subjid)
-vel_haz$subjid <- as.character(vel_haz$subjid)
-vel_lencm$subjid <- as.character(vel_lencm$subjid)
+pers_wast$subjid <- as.character(pers_wast$subjid)
 
 
 #------------------------------------
@@ -68,7 +68,6 @@ RF_tab <- function(d, Yvar="ever_stunted", statistic="N", A=c( "sex",           
                                   "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
                                   "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
                                   "feducyrs", "hfoodsec",  
-                                  "enwast", "anywast06", "pers_wast", 
                                   "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
                                   "perdiar6", "perdiar24", "predexfd6", "earlybf")){
   
@@ -133,8 +132,7 @@ RF_tab <- function(d, Yvar="ever_stunted", statistic="N", A=c( "sex",           
 prev <- left_join(prev, cov, by=c("studyid", "subjid", "country"))
 cuminc <- left_join(cuminc, cov, by=c("studyid", "subjid", "country"))
 rev <- left_join(rev, cov, by=c("studyid", "subjid", "country"))
-vel_haz <- left_join(vel_haz, cov, by=c("studyid", "subjid", "country"))
-vel_lencm <- left_join(vel_lencm, cov, by=c("studyid", "subjid", "country"))
+pers_wast <- left_join(pers_wast, cov, by=c("studyid", "subjid", "country"))
 
 
 
@@ -170,6 +168,14 @@ vel_hazMean_612 <- RF_tab(vel_haz[vel_haz$agecat=="6-12 months",], Yvar="y_rate"
 vel_hazN_1224 <- RF_tab(vel_haz[vel_haz$agecat=="12-24 months",], Yvar="y_rate")
 vel_hazMean_1224 <- RF_tab(vel_haz[vel_haz$agecat=="12-24 months",], Yvar="y_rate", statistic="mean")
 
+
+table(pers_wast$agecat)
+pers_wastN_024 <- RF_tab(pers_wast[pers_wast$agecat=="0-24 months",], Yvar="pers_wast.x")
+pers_wastCase_024 <- RF_tab(pers_wast[pers_wast$agecat=="0-24 months",], statistic="N_cases", Yvar="pers_wast.x")
+pers_wastN_624 <- RF_tab(pers_wast[pers_wast$agecat=="6-24 months",], Yvar="pers_wast.x")
+pers_wastCase_624 <- RF_tab(pers_wast[pers_wast$agecat=="6-24 months",], statistic="N_cases", Yvar="pers_wast.x")
+pers_wastN_06 <- RF_tab(pers_wast[pers_wast$agecat=="0-6 months",], Yvar="pers_wast.x")
+pers_wastCase_06 <- RF_tab(pers_wast[pers_wast$agecat=="0-6 months",], statistic="N_cases", Yvar="pers_wast.x")
 
 #------------------------------------
 # Convert to long form

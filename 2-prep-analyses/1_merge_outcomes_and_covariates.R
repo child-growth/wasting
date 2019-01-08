@@ -43,8 +43,10 @@ birthanthro_ci$subjid <- as.character(birthanthro_ci$subjid)
 #------------------------------------
 
 #merge in covariates
+dim(cuminc)
+dim(cov)
 d <- left_join(cuminc, cov, by=c("studyid", "subjid", "country"))
-head(d)
+dim(d)
 
 
 #Vector of outcome names
@@ -80,8 +82,9 @@ save(d, Y, A,V, id,  file="wast_cuminc_rf.Rdata")
 #merge in covariates
 cuminc_nobirth <- bind_rows(cuminc_nobirth, cuminc[cuminc$agecat=="6-24 months",])
 
+dim(cuminc_nobirth)
 d <- left_join(cuminc_nobirth, cov, by=c("studyid", "subjid", "country"))
-head(d)
+dim(d)
 
 
 
@@ -91,7 +94,6 @@ Y<-c("ever_wasted")
 #Vector of risk factor names
 A<-c( "gagebrth", "birthwt",    
       "birthlen", "vagbrth", "hdlvry",    
-      "enwast", "anywast06", "pers_wast", 
       "trth2o", "cleanck", "impfloor",  
       "impsan", "safeh20",
       "perdiar6", "perdiar24", 
@@ -117,8 +119,9 @@ save(d, Y, A,V, id,  file="wast_cuminc_nobirth_rf.Rdata")
 
 
 #merge in covariates
+dim(prev)
 d <- left_join(prev, cov, by=c("studyid", "subjid", "country"))
-head(d)
+dim(d)
 
 
 #Vector of outcome names
@@ -130,7 +133,6 @@ A<-c( "sex",              "gagebrth",      "birthwt",
       "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
       "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
       "feducyrs", "hfoodsec",  
-      "enwast", "anywast06", "pers_wast", 
       "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
       "perdiar6", "perdiar24", "predexfd6", 
       "predfeed3", "exclfeed3", "predfeed6", "exclfeed6", "predfeed36", "exclfeed36",
@@ -146,8 +148,9 @@ save(d, Y, A,V, id,  file="wast_prev_rf.Rdata")
 #------------------------------------
 
 #merge in covariates
+dim(rec)
 d <- left_join(rec, cov, by=c("studyid", "subjid", "country"))
-head(d)
+dim(d)
 
 
 #Vector of outcome names
@@ -159,7 +162,6 @@ A<-c( "sex",              "gagebrth",      "birthwt",
       "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
       "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
       "feducyrs", "hfoodsec",  
-      "enwast", "anywast06", "pers_wast", 
       "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
       "perdiar6", "perdiar24", "predexfd6", 
       "predfeed3", "exclfeed3", "predfeed6", "exclfeed6", "predfeed36", "exclfeed36",
@@ -172,20 +174,22 @@ save(d, Y, A,V, id,  file="wast_rec_rf.Rdata")
 #------------------------------------
 
 #merge in covariates
+dim(pers_wast)
 d <- left_join(pers_wast, cov, by=c("studyid", "subjid", "country"))
-head(d)
+dim(d)
+
+#Add empty columns for wasting outcomes to help longbow run
+d$enwast <- d$anywast06 <- NA 
 
 
 #Vector of outcome names
 Y<-"pers_wast"
-
 
 A<-c( "sex",              "gagebrth",      "birthwt",      
       "birthlen",      "vagbrth",       "hdlvry",        "mage",          "mhtcm",         "mwtkg",        
       "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
       "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
       "feducyrs", "hfoodsec",  
-      "enwast", "anywast06", "pers_wast", 
       "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
       "perdiar6", "perdiar24", "predexfd6", 
       "predfeed3", "exclfeed3", "predfeed6", "exclfeed6", "predfeed36", "exclfeed36",

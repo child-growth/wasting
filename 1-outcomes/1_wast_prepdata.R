@@ -20,7 +20,7 @@ d<-fread("U:/data/FINAL/UCB Rally7/Main/adam/FINAL.csv", header = T)
 
 #change names to lower case
 colnames(d) <- tolower(colnames(d))
-d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, month, whz, haz))
+d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, month, whz, haz, waz))
 
 #--------------------------------------------
 #Check for duplicate agedays
@@ -111,7 +111,7 @@ load("U:/data/compiled_WHZ_dataset.RData")
 # Subset to relevant variables
 #--------------------------------------------
 colnames(d)=tolower(colnames(d))
-d <- d %>% select(studyid, subjid, country, tr, agedays, month, whz, haz, measurefreq)
+d <- d %>% select(studyid, subjid, country, tr, agedays, month, whz, haz, waz, measurefreq)
 
 nrow(d)
 
