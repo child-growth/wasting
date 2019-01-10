@@ -73,16 +73,16 @@ morbidity <- specify_rf_analysis(A=Avars_morbidity,
                                  Y=c("co_occurence", "pers_wasted624"), file="stuntwast_morbidity.Rdata")
 
 #bind together datasets
-analyses <- rbind(mortality, morbidity)
-table(analyses$file)
+analyses_mortality <- rbind(mortality, morbidity)
+table(analyses_mortality$file)
 
 #Save analysis specification
-save(analyses, file="mortality_adjusted_analyses.rdata")
+save(analyses_mortality, file="mortality_adjusted_analyses.rdata")
 
 
 #Make unadjusted analysis set
 analyses$W <- NULL
-save(analyses, file="mortality_unadjusted_analyses.rdata")
+save(analyses_mortality, file="mortality_unadjusted_analyses.rdata")
 
 
 

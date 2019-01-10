@@ -59,8 +59,51 @@ pers_wast <- specify_rf_analysis(A=Avars, Y="pers_wast", file="pers_wast_rf.Rdat
 save(pers_wast, file="pers_wasting_adjusted_binary_analyses.rdata")
 
 
+#Specify the mortality analyses
+load("mortality_adjustment_sets_list.Rdata")
+
+Avars <- c("ever_wasted06",
+           "ever_swasted06",
+           "pers_wasted06",
+           "ever_stunted06",
+           "ever_sstunted06",
+           "ever_wasted024",
+           "ever_swasted024",
+           "pers_wasted024",
+           "ever_stunted024",
+           "ever_sstunted024",
+           "ever_wasted06_noBW",
+           "ever_swasted06_noBW",
+           "ever_wasted024_noBW",
+           "ever_swasted024_noBW",
+           "ever_underweight06",
+           "ever_sunderweight06",
+           "ever_underweight024",
+           "ever_sunderweight024",
+           "ever_co06",
+           "ever_co024")
+
+mortality <- specify_rf_analysis(A=Avars, Y=c("dead"), 
+                                 V= c("studyid","country"), id="id", adj_sets=adjustment_sets_mortality, 
+                                 file="stuntwast_mort.Rdata")
+
+Avars_morbidity <- c("ever_wasted06",
+                     "ever_swasted06",
+                     "pers_wasted06",
+                     "ever_stunted06",
+                     "ever_wasted06_noBW",
+                     "ever_swasted06_noBW",
+                     "ever_underweight06",
+                     "ever_co06")
+
+morbidity <- specify_rf_analysis(A=Avars_morbidity,
+                                 Y=c("co_occurence", "pers_wasted624"),
+                                 V= c("studyid","country"), id="id", adj_sets=adjustment_sets_mortality,
+                                 file="stuntwast_morbidity.Rdata")
+
+
 #bind together datasets
-analyses <- rbind(prev, cuminc, cuminc_nobirth, rec, pers_wast)
+analyses <- rbind(prev, cuminc, cuminc_nobirth, rec, pers_wast, mortality, morbidity)
 table(analyses$file)
 
 #Save analysis specification
@@ -105,4 +148,7 @@ save(analyses, file="prior_anthro_adjusted_binary_analyses.rdata")
 #Make unadjusted analysis set
 analyses$W <- NULL
 save(analyses, file="prior_anthro_unadjusted_binary_analyses.rdata")
+
+
+
 
