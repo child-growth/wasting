@@ -32,7 +32,6 @@ specify_rf_analysis <- function(A=names(adjustment_sets), Y, file,  W=NULL, V= c
 
 Avars <- c( "sex",  "brthmon", "month", names(adjustment_sets))
 
-
 prev <- specify_rf_analysis(A=Avars, Y=c("wasted","swasted"), file="wast_prev_rf.Rdata")
 
 cuminc <- specify_rf_analysis(A=c( "sex",               "mage",          "mhtcm",         "mwtkg",        
@@ -55,8 +54,22 @@ cuminc_nobirth <- specify_rf_analysis(A=c( "gagebrth",      "birthwt",
 
 rec <- specify_rf_analysis(A=Avars, id="subjid", Y="wast_rec90d", file="wast_rec_rf.Rdata")
 pers_wast <- specify_rf_analysis(A=Avars, Y="pers_wast", file="pers_wast_rf.Rdata")
-#run just the persistant wasting
-save(pers_wast, file="pers_wasting_adjusted_binary_analyses.rdata")
+
+
+#Birthweight stratified
+prev_BWstrat <- specify_rf_analysis(A=Avars, Y=c("wasted","swasted"), V= c("agecat","studyid","country", "birthwt"), file="wast_prev_rf.Rdata")
+
+cuminc_BWstrat  <- specify_rf_analysis(A=c( "sex",               "mage",          "mhtcm",         "mwtkg",        
+                                            "mbmi",          "single",        "fage",          "fhtcm",       
+                                            "nrooms",      "nchldlt5",    "nhh",              
+                                            "hhwealth_quart", "brthmon", "parity",   "meducyrs", 
+                                            "feducyrs", "hfoodsec"),
+                                       Y="ever_wasted",  V= c("agecat","studyid","country", "birthwt"), file="wast_cuminc_rf.Rdata")
+
+
+rec_BWstrat  <- specify_rf_analysis(A=Avars, id="subjid", Y="wast_rec90d", V= c("agecat","studyid","country", "birthwt"), file="wast_rec_rf.Rdata")
+pers_wast_BWstrat  <- specify_rf_analysis(A=Avars, Y="pers_wast", V= c("agecat","studyid","country", "birthwt"), file="pers_wast_rf.Rdata")
+
 
 
 #Specify the mortality analyses
@@ -91,9 +104,11 @@ Avars_morbidity <- c("ever_wasted06",
                      "ever_swasted06",
                      "pers_wasted06",
                      "ever_stunted06",
+                     "ever_sstunted06",
                      "ever_wasted06_noBW",
                      "ever_swasted06_noBW",
                      "ever_underweight06",
+                     "ever_sunderweight06",
                      "ever_co06")
 
 morbidity <- specify_rf_analysis(A=Avars_morbidity,
@@ -102,52 +117,35 @@ morbidity <- specify_rf_analysis(A=Avars_morbidity,
                                  file="stuntwast_morbidity.Rdata")
 
 
+mortality_BWstrat <- specify_rf_analysis(A=Avars, Y=c("dead"), 
+                                 V= c("studyid","country", "birthwt"), id="id", adj_sets=adjustment_sets_mortality, 
+                                 file="stuntwast_mort.Rdata")
+
+morbidity_BWstrat <- specify_rf_analysis(A=Avars_morbidity,
+                                 Y=c("co_occurence", "pers_wasted624"),
+                                 V= c("studyid","country", "birthwt"), id="id", adj_sets=adjustment_sets_mortality,
+                                 file="stuntwast_morbidity.Rdata")
+
+#Birthweight stratified
+
+
 #bind together datasets
 analyses <- rbind(prev, cuminc, cuminc_nobirth, rec, pers_wast, mortality, morbidity)
+
+
 table(analyses$file)
 
 #Save analysis specification
 #setwd("C:/Users/andre/Documents/HBGDki/Results/")
 save(analyses, file="wasting_adjusted_binary_analyses.rdata")
+save(analyses, file="U:/sprint_7D_longbow/wasting_analyses/wasting_adjusted_binary_analyses.rdata")
 
 
 #Make unadjusted analysis set
 analyses$W <- NULL
 save(analyses, file="wasting_unadjusted_binary_analyses.rdata")
+save(analyses, file="U:/sprint_7D_longbow/wasting_analyses/wasting_unadjusted_binary_analyses.rdata")
 
-
-#Run just the persistant wasting analysis
-analyses <- pers_wast
-save(analyses, file="persistant_wasting_adjusted_binary_analyses.rdata")
-
-
-#Make unadjusted analysis set
-analyses$W <- NULL
-save(analyses, file="persistant_wasting_unadjusted_binary_analyses.rdata")
-
-
-
-
-
-
-#Run just the birth anthro and lagged wasting/stuntinganalysis
-W=c("arm","sex", "W_mage", "W_fage", "meducyrs", "feducyrs", "hhwealth_quart", "hfoodsec",
-    "vagbrth","hdlvry",
-    "single",
-    "W_nrooms","W_nhh","W_nchldlt5",
-    "month","brthmon","W_parity",
-    "trth2o","cleanck","impfloor","impsan","safeh20")
-Wlist=list(born_wasted=W, born_stunted=W, lag_ever_stunted=W, lag_ever_wasted=W)
-birthanthro <- specify_rf_analysis(A=c("born_wasted", "born_stunted"), Y=c("ever_wasted", "ever_stunted"), adj_sets=Wlist, file="birthanthro_rf.Rdata")
-laganthro <- specify_rf_analysis(A=c("lag_ever_stunted", "lag_ever_wasted"), Y=c("ever_wasted", "ever_stunted"), adj_sets=Wlist, file="stuntwastCI_lag_rf.Rdata")
-
-analyses <- rbind(birthanthro, laganthro)
-
-save(analyses, file="prior_anthro_adjusted_binary_analyses.rdata")
-
-#Make unadjusted analysis set
-analyses$W <- NULL
-save(analyses, file="prior_anthro_unadjusted_binary_analyses.rdata")
 
 
 

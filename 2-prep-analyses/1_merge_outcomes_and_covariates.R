@@ -25,6 +25,7 @@ load("wast_cuminc_nobirth.rdata")
 load("pers_wast.rdata")
 load("wast_rec.rdata")
 load("birthanthro_cuminc.rdata")
+load("waz_vel_rf_outcomes.RData")
 
 
 #convert subjid to character for the merge with covariate dataset
@@ -35,6 +36,7 @@ cuminc_nobirth$subjid <- as.character(cuminc_nobirth$subjid)
 rec$subjid <- as.character(rec$subjid)
 pers_wast$subjid <- as.character(pers_wast$subjid)
 birthanthro_ci$subjid <- as.character(birthanthro_ci$subjid)
+vel_waz$subjid <- as.character(vel_waz$subjid)
 
 
 
@@ -212,6 +214,39 @@ Y<-c("ever_wasted", "ever_stunted")
 A<-c("born_wasted", "born_stunted")  
 
 save(d, Y, A,V, id,  file="birthanthro_rf.Rdata")
+
+
+
+#------------------------------------
+# Create growth velocity dataset
+#------------------------------------
+
+#WAZ
+
+#merge in covariates
+d <- left_join(vel_waz, cov, by=c("studyid", "subjid", "country"))
+head(d)
+
+
+#Vector of outcome names
+Y<-c("y_rate_waz")
+
+
+#Vector of covariate names
+W<-c("")
+
+#Subgroup variable
+V <- c("agecat")
+
+#clusterid ID variable
+id <- c("id")
+
+#Change outcome name to differentiate from lencm velocity outcome
+d <- d %>% rename(y_rate_waz=y_rate)
+
+save(d, Y, A,V, id, file="wast_waz_vel_rf.Rdata")
+
+
 
 
 

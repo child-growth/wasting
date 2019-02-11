@@ -1,8 +1,25 @@
 
 
+mean_sd <- function(x){
+  cat("\n", round(mean(x, na.rm=T),3),
+      "  ", round(sd(x, na.rm=T),3),"\n") 
+}
+N_perc <- function(x){
+  print(table(x))
+  cat("\n")
+  for(i in unique(x)){
+    cat(i,":     ")
+    y<-ifelse(x==i,1,0)
+    cat(sum(y, na.rm=T),
+        " (", round(mean(y*100, na.rm=T),3),")\n", sep = "") 
+  }
+}
+
+
 
 
 calc.prev.agecat <- function(d){
+  
   d = d %>% 
     arrange(studyid,subjid,agedays) %>%
     mutate(agecat=ifelse(agedays==1,"Birth",
@@ -16,6 +33,17 @@ calc.prev.agecat <- function(d){
                                                                           ifelse(agedays>23*30.4167& agedays<25*30.4167,"24 months","")))))))))) %>%
     mutate(agecat=factor(agecat,levels=c("Birth","3 months","6 months","9 months",
                                          "12 months","15 months","18 months","21 months","24 months"))) 
+}
+
+
+calc.monthly.agecat <- function(d){
+  
+  d$agecat <- cut(d$agedays, breaks=c(0:25)*30.4167-30.4167/2, include.lowest = F,
+              labels =paste0(0:24, " months"))
+  levels(d$agecat)[1] <- "Two weeks"
+  levels(d$agecat)[2] <- "One month"
+  table(d$agecat)
+return(d)
 }
 
 calc.ci.agecat <- function(d, range=3){
@@ -45,6 +73,450 @@ calc.ci.agecat <- function(d, range=3){
 
 
 
+#---------------------------------------
+# fit.rma function
+#---------------------------------------
+
+# random effects function, save results nicely
+fit.rma=function(data,age,ni,xi,measure,nlab){
+  data=filter(data,agecat==age)
+  
+  if(measure=="PLO"){
+    if(nrow(data)==1){
+      data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
+      data$se <- sqrt(data$vi)
+      
+      out=data %>% 
+        ungroup() %>%
+        mutate(nstudies=1, nmeas=data[[ni]]) %>%
+        mutate(agecat=age,est=plogis(yi), lb=plogis(yi-1.96*se), ub=plogis(yi+1.96*se),
+               nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),  " ",nlab),
+               nstudy.f=paste0("N=",nstudies," studies")) %>%
+        select(nstudies, nmeas,    agecat ,     est,        se,        lb,        ub ,          nmeas.f,     nstudy.f) %>%
+        as.tibble()
+      rownames(out) <- NULL
+    }else{
+      if(sum(data[[xi]])==0){
+        fit<-rma(ni=data[[ni]], xi=data[[xi]], 
+                 method="FE", measure="PLO") #Use FE model if all 0 counts because no heterogeneity and rma.glmm fails
+      }else{
+        fit<-rma.glmm(ni=data[[ni]], xi=data[[xi]], measure="PLO") 
+      }
+      out=data %>%
+        ungroup() %>%
+        summarise(nstudies=length(unique(studyid)),
+                  nmeas=sum(data[[ni]][agecat==age])) %>%
+        #mutate(agecat=age,est=exp(fit$beta), se=fit$se, lb=exp(fit$beta-1.96*fit$se), ub=exp(fit$beta+1.96*fit$se),
+        mutate(agecat=age,est=plogis(fit$beta), se=fit$se, lb=plogis(fit$beta-1.96*fit$se), ub=plogis(fit$beta+1.96*fit$se),
+               nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),  " ",nlab),
+               nstudy.f=paste0("N=",nstudies," studies")) %>% as.tibble()
+      rownames(out) <- NULL
+    }
+  }else{
+    if(measure!="IR"){
+      fit<-rma(ni=data[[ni]], xi=data[[xi]], 
+               method="REML", measure=measure)
+    }else{
+      fit<-rma(ti=data[[ni]], xi=data[[xi]], 
+               method="REML", measure=measure, to="if0all")
+    }
+    out=data %>%
+      ungroup() %>%
+      summarise(nstudies=length(unique(studyid)),
+                nmeas=sum(data[[ni]][agecat==age])) %>%
+      mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
+             nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
+                            " ",nlab),
+             nstudy.f=paste0("N=",nstudies," studies"))
+  }
+  return(out)
+  
+}
+
+
+
+# random effects function, save results nicely
+fit.cont.rma=function(data,age,yi,vi,ni,nlab){
+  
+  data=filter(data,agecat==age)
+  
+  fit <- NULL
+  try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML", measure = "GEN"))
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="ML", measure = "GEN"))}
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="DL", measure = "GEN"))}
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="HE", measure = "GEN"))}
+  
+  out = data %>%
+    ungroup() %>%
+    summarise(nstudies=length(unique(studyid)),
+              nmeas=sum(data[[ni]][agecat==age])) %>%
+    mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
+           nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
+                          " ",nlab),
+           nstudy.f=paste0("N=",nstudies," studies"))
+  return(out)
+}
+
+
+
+
+
+sem<-function(x){
+  sd(x)/sqrt(length(x))
+}
+
+
+
+
+
+#---------------------------------------
+# fit.escalc function
+#---------------------------------------
+
+# calc individual cohort PR variances, standard errors, and 95% CI from the rma() arguements, and append to dataset
+# Input:
+# meas: PR for prevalence, CI for cumulative incidence, and IR for incidence rate
+# PLO for log transformed prevalence (to prevent 95% CI outside 0 and 1).
+
+#Returns:
+# Inputted dataframe with appended columns
+# yi = outcome of interest
+# vi = variance of outcome
+# se = standard error
+# ci.lb = lower bound of 95% confidence interval
+# ci.ub = upper bound of 95% confidence interval
+
+fit.escalc<-function(data,age,ni,xi, meas){
+  data=filter(data,agecat==age)
+  
+  if(meas=="PLO"){
+    data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
+    data$se <- sqrt(data$vi)
+    data$ci.lb <- plogis(data$yi - 1.96 * data$se)
+    data$ci.ub <- plogis(data$yi + 1.96 * data$se)
+    data$yi <- plogis(data$yi)
+    
+  }else{
+    
+    if(meas=="PR"){
+      data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
+    }
+    
+    if(meas=="IR"){
+      data<-escalc(data=data, ti=data[[ni]], xi=data[[xi]], method="REML", measure="IR", append=T)
+    }
+    
+    data$se <- sqrt(data$vi)
+    data$ci.lb <- data$yi - 1.96 * data$se
+    data$ci.ub <- data$yi + 1.96 * data$se
+  }
+  return(data)
+}
+
+
+fit.escalc.cont <- function(data,age,yi,vi, meas){
+  data=filter(data,agecat==age)
+  
+  data <- data.frame(data, escalc(yi=data[[yi]], vi=data[[vi]], method="REML", measure="GEN"))
+  
+  data$se <- sqrt(data$vi)
+  data$ci.lb <- data$yi - 1.96 * data$se 
+  data$ci.ub <- data$yi + 1.96 * data$se 
+  
+  return(data)
+}
+
+
+#---------------------------------------
+# cohort-specific output formatting
+#---------------------------------------
+# if percentage, multiply est and ci by 100
+# create cohort name for plotting
+# create region variable 
+# add age labels for x-axis
+
+# Input:
+# data frame with fit.escalc output 
+# vector of labels for plotting
+
+#Returns:
+# data frame formatted for plotting cohort specific results
+cohort.format=function(df, lab, y, est="percent"){
+  y = as.numeric(y)
+  
+  # rescale percentages
+  if(est=="percent"){
+    df = df %>% mutate(y=y*100,ci.lb=ci.lb*100,ci.ub=ci.ub*100)
+  }
+  if(est=="rate"){
+    df = df %>% mutate(y=y*1000,ci.lb=ci.lb*1000,ci.ub=ci.ub*1000)
+  }
+  
+  # cohort name
+  df = df %>% mutate(cohort=paste0(studyid,"-",country)) %>%
+    mutate(cohort=gsub("ki[^-]*-","",cohort))
+  
+  # region variable
+  df <- df %>% mutate(region = case_when(
+    country=="BANGLADESH" | country=="INDIA"|
+      country=="NEPAL" | country=="PAKISTAN"|
+      country=="PHILIPPINES"                   ~ "Asia", 
+    country=="KENYA"|
+      country=="GHANA"|
+      country=="BURKINA FASO"|
+      country=="GUINEA-BISSAU"|
+      country=="MALAWI"|
+      country=="SOUTH AFRICA"|
+      country=="TANZANIA, UNITED REPUBLIC OF"|
+      country=="ZIMBABWE"|
+      country=="GAMBIA"                       ~ "Africa",
+    country=="BELARUS"                      ~ "Europe",
+    country=="BRAZIL" | country=="GUATEMALA" |
+      country=="PERU"                         ~ "Latin America",
+    TRUE                                    ~ "Other"
+  ))
+  
+  # create formatted age categories for plotting 
+  df <- df %>%  mutate(agecat=droplevels(as.factor(agecat)))
+  df <- df %>%  mutate(age.f = factor(agecat,levels=levels(df$agecat),
+                                      labels=lab))
+  
+  return(df)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+#---------------------------------------
+# fit.rma function
+#---------------------------------------
+
+# random effects function, save results nicely
+fit.rma=function(data,age,ni,xi,measure,nlab){
+  if(!is.na(age)){
+    data=filter(data,agecat==age)
+  }
+  if(measure=="PLO"){
+    if(nrow(data)==1){
+      data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
+      data$se <- sqrt(data$vi)
+      
+      out=data %>% 
+        ungroup() %>%
+        mutate(nstudies=1, nmeas=data[[ni]]) %>%
+        mutate(agecat=age,est=plogis(yi), lb=plogis(yi-1.96*se), ub=plogis(yi+1.96*se),
+               nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),  " ",nlab),
+               nstudy.f=paste0("N=",nstudies," studies")) %>%
+        select(nstudies, nmeas,    agecat ,     est,        se,        lb,        ub ,          nmeas.f,     nstudy.f) %>%
+        as.tibble()
+      rownames(out) <- NULL
+    }else{
+      if(sum(data[[xi]])==0){
+        fit<-rma(ni=data[[ni]], xi=data[[xi]], 
+                 method="FE", measure="PLO") #Use FE model if all 0 counts because no heterogeneity and rma.glmm fails
+      }else{
+        fit<-rma.glmm(ni=data[[ni]], xi=data[[xi]], measure="PLO") 
+      }
+      out=data %>%
+        ungroup() %>%
+        summarise(nstudies=length(unique(studyid)),
+                  nmeas=sum(data[[ni]][agecat==age])) %>%
+        #mutate(agecat=age,est=exp(fit$beta), se=fit$se, lb=exp(fit$beta-1.96*fit$se), ub=exp(fit$beta+1.96*fit$se),
+        mutate(agecat=age,est=plogis(fit$beta), se=fit$se, lb=plogis(fit$beta-1.96*fit$se), ub=plogis(fit$beta+1.96*fit$se),
+               nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),  " ",nlab),
+               nstudy.f=paste0("N=",nstudies," studies")) %>% as.tibble()
+      rownames(out) <- NULL
+    }
+  }else{
+    if(measure!="IR"){
+      fit<-rma(ni=data[[ni]], xi=data[[xi]], 
+               method="REML", measure=measure)
+    }else{
+      fit<-rma(ti=data[[ni]], xi=data[[xi]], 
+               method="REML", measure=measure, to="if0all")
+    }
+    out=data %>%
+      ungroup() %>%
+      summarise(nstudies=length(unique(studyid)),
+                nmeas=sum(data[[ni]][agecat==age])) %>%
+      mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
+             nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
+                            " ",nlab),
+             nstudy.f=paste0("N=",nstudies," studies"))
+  }
+  return(out)
+  
+}
+
+
+
+# random effects function, save results nicely
+fit.cont.rma=function(data,age,yi,vi,ni,nlab){
+  
+  data=filter(data,agecat==age)
+  
+  fit <- NULL
+  try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML", measure = "GEN"))
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="ML", measure = "GEN"))}
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="DL", measure = "GEN"))}
+  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="HE", measure = "GEN"))}
+  
+  out = data %>%
+    ungroup() %>%
+    summarise(nstudies=length(unique(studyid)),
+              nmeas=sum(data[[ni]][agecat==age])) %>%
+    mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
+           nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
+                          " ",nlab),
+           nstudy.f=paste0("N=",nstudies," studies"))
+  return(out)
+}
+
+
+
+
+
+sem<-function(x){
+  sd(x)/sqrt(length(x))
+}
+
+
+
+
+
+#---------------------------------------
+# fit.escalc function
+#---------------------------------------
+
+# calc individual cohort PR variances, standard errors, and 95% CI from the rma() arguements, and append to dataset
+# Input:
+# meas: PR for prevalence, CI for cumulative incidence, and IR for incidence rate
+# PLO for log transformed prevalence (to prevent 95% CI outside 0 and 1).
+
+#Returns:
+# Inputted dataframe with appended columns
+# yi = outcome of interest
+# vi = variance of outcome
+# se = standard error
+# ci.lb = lower bound of 95% confidence interval
+# ci.ub = upper bound of 95% confidence interval
+
+fit.escalc<-function(data,age,ni,xi, meas){
+  data=filter(data,agecat==age)
+  
+  if(meas=="PLO"){
+    data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
+    data$se <- sqrt(data$vi)
+    data$ci.lb <- plogis(data$yi - 1.96 * data$se)
+    data$ci.ub <- plogis(data$yi + 1.96 * data$se)
+    data$yi <- plogis(data$yi)
+    
+  }else{
+    
+    if(meas=="PR"){
+      data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
+    }
+    
+    if(meas=="IR"){
+      data<-escalc(data=data, ti=data[[ni]], xi=data[[xi]], method="REML", measure="IR", append=T)
+    }
+    
+    data$se <- sqrt(data$vi)
+    data$ci.lb <- data$yi - 1.96 * data$se
+    data$ci.ub <- data$yi + 1.96 * data$se
+  }
+  return(data)
+}
+
+
+fit.escalc.cont <- function(data,age,yi,vi, meas){
+  data=filter(data,agecat==age)
+  
+  data <- data.frame(data, escalc(yi=data[[yi]], vi=data[[vi]], method="REML", measure="GEN"))
+  
+  data$se <- sqrt(data$vi)
+  data$ci.lb <- data$yi - 1.96 * data$se 
+  data$ci.ub <- data$yi + 1.96 * data$se 
+  
+  return(data)
+}
+
+
+#---------------------------------------
+# cohort-specific output formatting
+#---------------------------------------
+# if percentage, multiply est and ci by 100
+# create cohort name for plotting
+# create region variable 
+# add age labels for x-axis
+
+# Input:
+# data frame with fit.escalc output 
+# vector of labels for plotting
+
+#Returns:
+# data frame formatted for plotting cohort specific results
+cohort.format=function(df, lab, y, est="percent"){
+  y = as.numeric(y)
+  
+  # rescale percentages
+  if(est=="percent"){
+    df = df %>% mutate(y=y*100,ci.lb=ci.lb*100,ci.ub=ci.ub*100)
+  }
+  if(est=="rate"){
+    df = df %>% mutate(y=y*1000,ci.lb=ci.lb*1000,ci.ub=ci.ub*1000)
+  }
+  
+  # cohort name
+  df = df %>% mutate(cohort=paste0(studyid,"-",country)) %>%
+    mutate(cohort=gsub("ki[^-]*-","",cohort))
+  
+  # region variable
+  df <- df %>% mutate(region = case_when(
+    country=="BANGLADESH" | country=="INDIA"|
+      country=="NEPAL" | country=="PAKISTAN"|
+      country=="PHILIPPINES"                   ~ "Asia", 
+    country=="KENYA"|
+      country=="GHANA"|
+      country=="BURKINA FASO"|
+      country=="GUINEA-BISSAU"|
+      country=="MALAWI"|
+      country=="SOUTH AFRICA"|
+      country=="TANZANIA, UNITED REPUBLIC OF"|
+      country=="ZIMBABWE"|
+      country=="GAMBIA"                       ~ "Africa",
+    country=="BELARUS"                      ~ "Europe",
+    country=="BRAZIL" | country=="GUATEMALA" |
+      country=="PERU"                         ~ "Latin America",
+    TRUE                                    ~ "Other"
+  ))
+  
+  # create formatted age categories for plotting 
+  df <- df %>%  mutate(agecat=droplevels(as.factor(agecat)))
+  df <- df %>%  mutate(age.f = factor(agecat,levels=levels(df$agecat),
+                                      labels=lab))
+  
+  return(df)
+}
+
+
+
+
+
+
+
+
+
+
 summary.prev <- function(d, severe.wasted=F){
   
   # take mean of multiple measurements within age window
@@ -67,7 +539,7 @@ summary.prev <- function(d, severe.wasted=F){
     summarise(nmeas=sum(!is.na(whz)),
               prev=mean(wasted),
               nxprev=sum(wasted==1)) %>%
-    filter(nmeas>=5) 
+    filter(nmeas>=50) 
   
   prev.data <- droplevels(prev.data)
 
@@ -93,22 +565,95 @@ summary.prev <- function(d, severe.wasted=F){
   
   
   # estimate random effects in birth cohorts only
-  birthcohorts<-prev.data$studyid[prev.data$agecat=="Birth"]
-  prev.res.birthcohorts=lapply((levels(prev.data$agecat)),function(x) 
-    fit.rma(data=prev.data[prev.data$studyid %in% birthcohorts, ],ni="nmeas", xi="nxprev",age=x,measure="PLO",nlab="children"))
-  prev.res.birthcohorts=as.data.frame(rbindlist(prev.res.birthcohorts))
-  
-  prev.res.birthcohorts[,4]=as.numeric(prev.res.birthcohorts[,4])
-  prev.res.birthcohorts[,6]=as.numeric(prev.res.birthcohorts[,6])
-  prev.res.birthcohorts[,7]=as.numeric(prev.res.birthcohorts[,7])
-  
-  prev.res.birthcohorts = prev.res.birthcohorts %>%
-    mutate(est=est*100,lb=lb*100,ub=ub*100)
-  prev.res.birthcohorts$agecat=factor(prev.res.birthcohorts$agecat,levels=levels(prev.data$agecat))
-  prev.res.birthcohorts$ptest.f=sprintf("%0.0f",prev.res.birthcohorts$est)
-  
+  prev.res.birthcohorts=NULL
+  if("Birth" %in% unique(prev.data$agecat)){
+    birthcohorts<-prev.data$studyid[prev.data$agecat=="Birth"]
+    prev.res.birthcohorts=lapply((levels(prev.data$agecat)),function(x) 
+      fit.rma(data=prev.data[prev.data$studyid %in% birthcohorts, ],ni="nmeas", xi="nxprev",age=x,measure="PLO",nlab="children"))
+    prev.res.birthcohorts=as.data.frame(rbindlist(prev.res.birthcohorts))
+    
+    prev.res.birthcohorts[,4]=as.numeric(prev.res.birthcohorts[,4])
+    prev.res.birthcohorts[,6]=as.numeric(prev.res.birthcohorts[,6])
+    prev.res.birthcohorts[,7]=as.numeric(prev.res.birthcohorts[,7])
+    
+    prev.res.birthcohorts = prev.res.birthcohorts %>%
+      mutate(est=est*100,lb=lb*100,ub=ub*100)
+    prev.res.birthcohorts$agecat=factor(prev.res.birthcohorts$agecat,levels=levels(prev.data$agecat))
+    prev.res.birthcohorts$ptest.f=sprintf("%0.0f",prev.res.birthcohorts$est)
+  }
   return(list(prev.data=prev.data, prev.res=prev.res, prev.res.birthcohorts=prev.res.birthcohorts, prev.cohort=prev.cohort))
 }
+
+
+
+summary.ci <- function(d,  
+                       agelist=list("0-3 months","3-6 months","6-9 months","9-12 months",
+                                    "12-15 months","15-18 months","18-21 months","21-24 months")){
+  
+  
+  # identify ever stunted children
+  evs = d %>%
+    filter(!is.na(agecat)) %>%
+    group_by(studyid,country,subjid) %>%
+    arrange(studyid,subjid) %>%
+    #create variable with minwhz by age category, cumulatively
+    mutate(minwhz=ifelse(agecat=="0-3 months",min(whz[agecat=="0-3 months"]),
+                         ifelse(agecat=="3-6 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"]),
+                                ifelse(agecat=="6-9 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"|agecat=="6-9 months"]),
+                                       ifelse(agecat=="9-12 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"|agecat=="6-9 months"|agecat=="9-12 months"]),
+                                              ifelse(agecat=="12-15 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"|agecat=="6-9 months"|agecat=="9-12 months"|agecat=="12-15 months"]),
+                                                     ifelse(agecat=="15-18 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"|agecat=="6-9 months"|agecat=="9-12 months"|agecat=="12-15 months"|agecat=="15-18 months"]),
+                                                            ifelse(agecat=="18-21 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"|agecat=="6-9 months"|agecat=="9-12 months"|agecat=="12-15 months"|agecat=="15-18 months"|agecat=="18-21 months"]),
+                                                                   ifelse(agecat=="21-24 months",min(whz[agecat=="0-3 months" | agecat=="3-6 months"|agecat=="6-9 months"|agecat=="9-12 months"|agecat=="12-15 months"|agecat=="15-18 months"|agecat=="18-21 months"|agecat=="21-24 months"]),
+                                                                          min(whz)))))))))) %>%
+    # create indicator for whether the child was ever stunted
+    # by age category
+    group_by(studyid,country,agecat,subjid) %>%
+    summarise(minwhz=min(minwhz)) %>%
+    mutate(ever_wasted=ifelse(minwhz< -2,1,0))
+  
+  
+  # count incident cases per study by age
+  # exclude time points if number of measurements per age
+  # in a study is <50  
+  cuminc.data= evs%>%
+    group_by(studyid,country,agecat) %>%
+    summarise(
+      nchild=length(unique(subjid)),
+      nstudy=length(unique(studyid)),
+      ncases=sum(ever_wasted),
+      N=sum(length(ever_wasted))) %>%
+    filter(N>=5)
+  
+  cuminc.data <- droplevels(cuminc.data)
+  agelist <- agelist[agelist %in% levels(cuminc.data$agecat)]
+  
+  if(class(agelist)!="list"){
+    agelist=list(agelist)
+  }
+  
+  # cohort specific results
+  ci.cohort=lapply(agelist,function(x) 
+    fit.escalc(data=cuminc.data,ni="N", xi="ncases",age=x,meas="PLO"))
+  ci.cohort=as.data.frame(do.call(rbind, ci.cohort))
+  ci.cohort=cohort.format(ci.cohort,y=ci.cohort$yi,
+                          lab=  agelist)
+  
+  # estimate random effects, format results
+  ci.res=lapply((agelist),function(x)
+    fit.rma(data=cuminc.data,ni="N", xi="ncases",age=x,measure="PLO",nlab=" measurements"))
+  ci.res=as.data.frame(rbindlist(ci.res))
+  ci.res[,4]=as.numeric(ci.res[,4])
+  ci.res[,6]=as.numeric(ci.res[,6])
+  ci.res[,7]=as.numeric(ci.res[,7])
+  ci.res = ci.res %>%
+    mutate(est=est*100, lb=lb*100, ub=ub*100)
+  ci.res$ptest.f=sprintf("%0.0f",ci.res$est)
+  
+  
+  return(list(cuminc.data=cuminc.data, ci.res=ci.res, ci.cohort=ci.cohort))
+}
+
 
 
 
@@ -129,7 +674,7 @@ summary.whz <- function(d){
     summarise(nmeas=sum(!is.na(whz)),
               meanwhz=mean(whz),
               varwhz=var(whz)) %>%
-    filter(nmeas>=5) 
+    filter(nmeas>=50) 
   
   whz.data <- droplevels(whz.data)
   
@@ -138,7 +683,7 @@ summary.whz <- function(d){
     fit.escalc.cont(data=whz.data,yi="meanwhz", vi="varwhz",age=x))
   whz.cohort=as.data.frame(rbindlist(whz.cohort))
   whz.cohort=cohort.format(whz.cohort,y=whz.cohort$yi,
-                           lab=  levels(whz.data$agecat))
+                           lab=  levels(whz.data$agecat), est="mean")
   
   
   # estimate random effects, format results
@@ -156,10 +701,80 @@ summary.whz <- function(d){
 }
 
 
+summary.rec.stunt <- function(d){
+  
+  # subset to stunted between birth and 3 months
+  stunt.24 <- d %>%
+    filter(agedays<=25*30.4167) %>%
+    # identify last two measurements prior to 24 months
+    group_by(studyid,country,subjid) %>%
+    mutate(rank=min_rank(-agedays)) %>%
+    # drop last 2 measurements prior to 24 m
+    filter(rank> 2) %>%
+    # create stunting indicator
+    mutate(measid=seq_along(subjid))  %>%
+    mutate(stunted=ifelse(haz< -2,1,0),
+           lagstunted=lag(stunted),
+           leadstunted=lead(stunted))  %>%
+    # unique stunting episode
+    mutate(sepisode=ifelse(lagstunted==0 & stunted==1 & leadstunted==1 |
+                             stunted==1 & measid==1,1,0)) %>%
+    # identify whether child had stunting episode by 24 months 
+    summarise(stunted24=max(sepisode,na.rm=TRUE))
+  
+  rec.24 <- d %>%
+    filter(agedays<=25*30.4167) %>%
+    # identify last two measurements prior to 24 months
+    group_by(studyid,country,subjid) %>%
+    mutate(rank=min_rank(-agedays)) %>%
+    # keep last two measurements 
+    filter(rank<= 2) %>%
+    # flag kids with 2 measurements not stunted
+    mutate(rec=ifelse(haz>= -2,1,0)) %>%
+    mutate(recsum=cumsum(rec)) %>%
+    # one row for each kid, indicator for recovered
+    summarise(maxrec=max(recsum)) %>%
+    mutate(rec24=ifelse(maxrec==2,1,0)) %>%
+    select(-c(maxrec))
+  
+  
+  rev <- full_join(stunt.24, rec.24,by=c("studyid","country","subjid")) %>%
+    # subset to kids who were stunted
+    filter(stunted24==1) %>%
+    mutate(srec24=ifelse(stunted24==1 & rec24==1,1,0)) %>%
+    mutate(snorec24=ifelse(stunted24==1 & rec24==0,1,0)) 
+  
+  rev = rev %>% mutate(stunted24s=ifelse(stunted24==1,"Stunted","Not stunted"))
+  rev = rev %>% mutate(rec24s=ifelse(rec24==1,"Recover","Not recover"))
+  
+  # prepare data for pooling 
+  rev.data <- rev %>%
+    group_by(studyid,country) %>%
+    summarise(mn.r=mean(srec24,na.rm=TRUE),
+              n.r=sum(srec24,na.rm=TRUE),
+              N.r=sum(!is.na(srec24)),
+              mn.s=mean(snorec24,na.rm=TRUE),
+              n.s=sum(snorec24,na.rm=TRUE),
+              N.s=sum(!is.na(snorec24))) %>%
+    mutate(agecat=as.factor("24 months")) %>%
+    filter(n.r!=0 & N.r!=0)
+  
+  
+  # estimate random effects, format results
+  fit.r=fit.rma(data=rev.data,ni="N.r", xi="n.r",age="24 months",measure="PLO",nlab="stunted children")
+  fit.r = fit.r %>%
+    mutate(est=est*100,lb=lb*100,ub=ub*100)
+  fit.r$ptest.f=sprintf("%0.0f",fit.r$est)
+  
+  # cohort specific results
+  rec.cohort=fit.escalc(data=rev.data,ni="N.r", xi="n.r",age="24 months",meas="PLO")
+  rec.cohort=cohort.format(rec.cohort, y=rec.cohort$yi,lab="24 months")
+  
+  return(list(rev.data=rev.data, rev.res=fit.r, rec.cohort=rec.cohort))
+}
 
 
-
-summary.ci <- function(d, recovery=F, severe.wasted=F, agelist=list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
+summary.incprop <- function(d, recovery=F, severe.wasted=F, agelist=list("0-3 months","3-6 months","6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months")){
   
   if(recovery==T){
     d$wast_inc <- d$wast_rec
@@ -184,7 +799,7 @@ summary.ci <- function(d, recovery=F, severe.wasted=F, agelist=list("0-3 months"
       nstudy=length(unique(studyid)),
       ncases=sum(ever_wasted),
       N=sum(length(ever_wasted))) %>%
-    filter(N>=5)
+    filter(N>=50)
   
   cuminc.data <- droplevels(cuminc.data)
   agelist <- agelist[agelist %in% levels(cuminc.data$agecat)]
@@ -240,8 +855,8 @@ summary.rec60 <- function(d, length=60, agelist=as.list(c("0-3 months","3-6 mont
       nchild=length(unique(subjid)),
       nstudy=length(unique(studyid)),
       ncases=sum(ever_wasted),
-      N=sum(length(ever_wasted))) %>%
-    filter(N>=5)
+      N=sum(length(ever_wasted)))# %>%
+  #  filter(N>=50)
   
   
   
@@ -289,7 +904,7 @@ summary.perswast <- function(d, agelist=c("0-3 months","3-6 months","6-9 months"
       nstudy=length(unique(studyid)),
       ncases=sum(pers_wast),
       N=sum(length(pers_wast))) %>%
-    filter(N>=5)
+    filter(N>=50)
   
   
   
@@ -434,8 +1049,78 @@ summary.dur <- function(d){
   return(plotdf)
 }
 
+
+#stunitng reversal
+
+summary.stunt.rev <- function(d){
+  
+  d <- d %>% mutate(agem=agedays/30.4167)
+  
+  # stunted by age x, recovered by age y
+  # children with recovery=NA didn't have 2 measurements
+  # in the age window, so recovery could not be assessed
+  rec.03=rec.age(data=d,s.agem=1,r.agem=3)
+  rec.36=rec.age(data=d,s.agem=3,r.agem=6)
+  rec.69=rec.age(data=d,s.agem=6,r.agem=9)
+  rec.912=rec.age(data=d,s.agem=9,r.agem=12)
+  rec.1215=rec.age(data=d,s.agem=12,r.agem=15)
+  rec.1518=rec.age(data=d,s.agem=15,r.agem=18)
+  rec.1821=rec.age(data=d,s.agem=18,r.agem=21)
+  rec.2124=rec.age(data=d,s.agem=21,r.agem=24)
+  
+  # prepare data for pooling 
+  rec.03.sum=summary_rev_df(rec.03, Age="0-3 months")
+  rec.36.sum=summary_rev_df(rec.36, Age="3-6 months")
+  rec.69.sum=summary_rev_df(rec.69, Age="6-9 months")
+  rec.912.sum=summary_rev_df(rec.912, Age="9-12 months")
+  rec.1215.sum=summary_rev_df(rec.1215, Age="12-15 months")
+  rec.1518.sum=summary_rev_df(rec.1518, Age="15-18 months")
+  rec.1821.sum=summary_rev_df(rec.1821, Age="18-21 months")
+  rec.2124.sum=summary_rev_df(rec.2124, Age="21-24 months")
+  
+  rev.data=bind_rows(rec.03.sum,rec.36.sum,rec.69.sum,
+                     rec.912.sum, rec.1215.sum, rec.1518.sum,
+                     rec.1821.sum, rec.2124.sum) 
+  rev.data = rev.data %>%mutate(agecat=as.factor(agecat))
+  
+  # cohort specific results
+  rec.cohort=lapply(list("0-3 months","3-6 months","6-9 months",
+                         "9-12 months","12-15 months","15-18 months",
+                         "18-21 months", "21-24 months"),function(x) 
+                           fit.escalc(data=rev.data,ni="N", xi="n",age=x,meas="PLO"))
+  rec.cohort=as.data.frame(do.call(rbind, rec.cohort))
+  rec.cohort=cohort.format(rec.cohort,y=rec.cohort$yi,
+                           lab=  c("0-3 months","3-6 months","6-9 months",
+                                   "9-12 months","12-15 months","15-18 months",
+                                   "18-21 months", "21-24 months"))
+  
+  
+  # estimate random effects, format results
+  rev.res=lapply(list("0-3 months","3-6 months","6-9 months",
+                      "9-12 months","12-15 months","15-18 months",
+                      "18-21 months", "21-24 months"),function(x) 
+                        fit.rma(rev.data,ni="N", xi="n",age=x,measure="PLO",
+                                nlab="children"))
+  rev.res=as.data.frame(do.call(rbind, rev.res))
+  rev.res[,4]=as.numeric(rev.res[,4])
+  rev.res[,5]=as.numeric(rev.res[,5])
+  rev.res[,6]=as.numeric(rev.res[,6])
+  rev.res[,7]=as.numeric(rev.res[,7])
+  rev.res = rev.res %>%
+    mutate(est=est*100,lb=lb*100,ub=ub*100)
+  rev.res$agecat=factor(rev.res$agecat,levels=c("0-3 months","3-6 months","6-9 months",
+                                                "9-12 months","12-15 months","15-18 months",
+                                                "18-21 months", "21-24 months"))
+  
+  rev.res$ptest.f=sprintf("%0.1f",rev.res$est)
+  
+  return(list(rev.data=rev.data, rev.res=rev.res, rev.cohort=rec.cohort))
+}
+
+
+
 #----------------------------------------------
-# markt the start of wasted of not wasted episodes 
+# mark the start of wasted of not wasted episodes 
 #----------------------------------------------
 
 mark_episodes <- function(d){
@@ -526,6 +1211,198 @@ mean95CI <- function(Y, id=rep(1:length(Y)), persontime=NULL, proportion=F, perc
 
 
 
+
+
+# Stunting incidence person-time calculation
+
+summary.stunt.ir <- function(d, agelist, sev_stunt=F){
+  
+  Cutoff= ifelse(sev_stunt, -3, -2)
+  
+  inc.prep = d %>%
+    filter(!is.na(agecat) & agedays>1) %>%
+    group_by(studyid,subjid) %>%
+    arrange(studyid,subjid,agedays) %>%
+    
+    # create id for measurement within person
+    mutate(measid=seq_along(subjid)) %>%
+    # duration between measurements 
+    mutate(agedayslag=lag(agedays)) %>%
+    mutate(agedayslag=ifelse(is.na(agedayslag),0,agedayslag)) %>%
+    mutate(deltat=ifelse(measid==1 & agecat=="Birth",0,agedays-agedayslag)) %>%
+    
+    # create indicator for whether haz at t < haz at t-1
+    mutate(hazlag=lag(haz)) %>%
+    mutate(newcase=ifelse(measid==1,ifelse(haz< Cutoff, 1,0),
+                          ifelse(hazlag>= Cutoff & haz< Cutoff,1,0))) %>%
+    mutate(newcaselag=lag(newcase))%>%
+    mutate(newcaselag=ifelse(measid==1,0,newcaselag))%>%
+    mutate(cnewcaselag=cumsum(newcaselag)) %>%
+    
+    # create at risk variable
+    mutate(atrisk=ifelse(cnewcaselag>=1,0,1)) %>%
+    # create inc case variable
+    mutate(inccase=ifelse(cnewcaselag>=1,0,newcase)) %>%
+    
+    # create delta t with half interval for row
+    # with incident case assuming it occurred halfway through
+    # the follow-up period
+    mutate(deltat_half=deltat/2) %>%
+    mutate(deltat2=ifelse(inccase==0,deltat,deltat_half)) %>%
+    
+    # create person days
+    mutate(pdays=atrisk*deltat2) %>%
+    
+    # clean up
+    select(-c(hazlag,newcase,newcaselag, cnewcaselag,agedayslag,
+              deltat,deltat_half))
+  
+  # manually calculate incident cases, person-time at risk at each time point
+  inc.prep %>%
+    group_by(agecat) %>%
+    summarise(inc.case=sum(inccase),ptar=sum(pdays)) %>%
+    mutate(cruderate=inc.case/ptar)
+  
+  
+  # count incident cases and sum person time at risk per study by age
+  # exclude time points if number of children per age
+  # in a study is <50  
+  inc.data = inc.prep %>%
+    group_by(studyid,country,agecat) %>%
+    summarise(ptar=sum(pdays),
+              ncase=sum(inccase),
+              nchild=length(unique(subjid)),
+              nstudy=length(unique(studyid))) %>%
+    filter(nchild>=50 & !is.na(agecat))
+  
+  
+  # cohort specific results
+  inc.cohort=lapply((agelist),function(x) 
+    fit.escalc(data=inc.data,ni="ptar", xi="ncase",age=x,meas="IR"))
+  inc.cohort=as.data.frame(rbindlist(inc.cohort))
+  inc.cohort$agecat=factor(inc.cohort$agecat,levels=
+                             c(agelist))
+  inc.cohort$yi.f=sprintf("%0.0f",inc.cohort$yi)
+  inc.cohort$cohort=paste0(inc.cohort$studyid,"-",inc.cohort$country)
+  inc.cohort = inc.cohort %>% mutate(region = ifelse(country=="BANGLADESH" | country=="INDIA"|
+                                                       country=="NEPAL" | country=="PAKISTAN"|
+                                                       country=="PHILIPPINES" ,"Asia",
+                                                     ifelse(country=="BURKINA FASO"|
+                                                              country=="GUINEA-BISSAU"|
+                                                              country=="MALAWI"|
+                                                              country=="SOUTH AFRICA"|
+                                                              country=="TANZANIA, UNITED REPUBLIC OF"|
+                                                              country=="ZIMBABWE"|
+                                                              country=="GAMBIA","Africa",
+                                                            ifelse(country=="BELARUS","Europe",
+                                                                   "Latin America"))))
+  
+  
+  # estimate random effects, format results
+  ir.res=lapply((agelist),function(x)
+    fit.rma(data=inc.data,ni="ptar", xi="ncase",age=x,measure="IR",nlab=" person-days"))
+  ir.res=as.data.frame(rbindlist(ir.res))
+  ir.res[,4]=as.numeric(ir.res[,4])
+  ir.res[,6]=as.numeric(ir.res[,6])
+  ir.res[,7]=as.numeric(ir.res[,7])
+  
+  ir.res$pt.f=paste0("N=",format(ir.res$nmeas,big.mark=",",scientific=FALSE),
+                     " person-days")
+  ir.res$ptest.f=sprintf("%0.02f",ir.res$est*1000)
+  
+  return(list(ir.data=inc.data, ir.res=ir.res, ir.cohort=inc.cohort))
+
+}
+
+
+
+
+# inputs:
+rec.age=function(s.agem,r.agem,data){
+  # subset to stunted between birth and 3 months
+  stunt <- data %>%
+    filter(agem<=s.agem) 
+  
+  if(s.agem>1){
+    # identify last two measurements prior to 24 months
+    stunt <- stunt %>%
+      group_by(studyid,country,subjid) %>%
+      mutate(rank=min_rank(-agedays)) %>%
+      # drop last 2 measurements prior to 24 m
+      filter(rank> 2) 
+  }
+  # create stunting indicator
+  stunt <- stunt %>%
+    mutate(measid=seq_along(subjid))  %>%
+    mutate(stunted=ifelse(haz< -2,1,0),
+           lagstunted=lag(stunted),
+           leadstunted=lead(stunted))  %>%
+    # unique stunting episode
+    mutate(sepisode=ifelse(lagstunted==0 & stunted==1 & leadstunted==1 |
+                             stunted==1 & measid==1,1,0)) %>%
+    # identify whether child had stunting episode by 24 months 
+    group_by(studyid,country,subjid) %>%
+    summarise(stunted=max(sepisode,na.rm=TRUE))
+  
+  rec.prev <- data %>%
+    filter(agem<=s.agem) %>%
+    # identify last two measurements prior to 24 months
+    group_by(studyid,country,subjid) %>%
+    mutate(rank=min_rank(-agedays)) %>%
+    # keep last two measurements 
+    filter(rank<= 2) %>%
+    # flag kids with 2 measurements not stunted
+    mutate(rec=ifelse(haz>= -2,1,0)) %>%
+    mutate(recsum=cumsum(rec)) %>%
+    # one row for each kid, indicator for recovered
+    summarise(maxrec=max(recsum)) %>%
+    mutate(rec.prev=ifelse(maxrec==2,1,0)) %>%
+    select(-c(maxrec))
+  
+  rec <- data %>%
+    filter(agem>s.agem & agem<=r.agem) %>%
+    # identify last two measurements prior to 24 months
+    group_by(studyid,country,subjid) %>%
+    mutate(rank=min_rank(-agedays)) %>%
+    # keep last two measurements 
+    filter(rank<= 2) %>%
+    # flag kids with 2 measurements not stunted
+    mutate(rec=ifelse(haz>= -2,1,0)) %>%
+    mutate(recsum=cumsum(rec)) %>%
+    # one row for each kid, indicator for recovered
+    summarise(maxrec=max(recsum)) %>%
+    mutate(rec=ifelse(maxrec==2,1,0)) %>%
+    select(-c(maxrec))
+  
+  rev <- full_join(stunt, rec,by=c("studyid","country","subjid")) 
+  rev <- full_join(rev, rec.prev,by=c("studyid","country","subjid")) %>%
+    # subset to kids who were stunted
+    filter(stunted==1) %>%
+    mutate(recovered=ifelse(stunted==1 & rec==1 & rec.prev==0,1,0)) %>%
+    select(-c(stunted,rec,rec.prev))
+  
+  return(rev)
+}
+
+
+#Recovery summary measures ooling function
+summary_rev_df <- function(d, Age="0-3 months"){
+  res=d %>%
+    group_by(studyid,country) %>%
+    summarise(mn=mean(recovered,na.rm=TRUE),
+              n=sum(recovered,na.rm=TRUE),
+              N=sum(!is.na(recovered))) %>%
+    mutate(agecat=Age)
+  return(res)
+}
+
+
+
+
+
+
+
+
 #Function to calculate the robust SEs
 sandwichSE <- function (dat, fm, cluster) 
 {
@@ -548,15 +1425,20 @@ sandwichSE <- function (dat, fm, cluster)
 #----------------------------------------------
 #create function to calc unstrat and age stat incidence
 #----------------------------------------------
-WastIncCalc<-function(d, washout=60, dropBornWasted=F){
+WastIncCalc<-function(d, washout=60, dropBornWasted=F, stunt=F){
   
   require(tidyverse)
   require(zoo)  
   
   #Filter out extreme or missing whz values
+  if(stunt==F){
   d <- d %>%  ungroup() %>% filter(!is.na(whz)) %>%
     filter(whz > (-5) & whz < 5)
-  
+  }else{
+    d$whz <- d$haz
+    d <- d %>%  ungroup() %>% filter(!is.na(whz)) %>%
+      filter(whz >= (-6) & whz <= 6)    
+  }
   #Remove duplicate ages
   ndropped <- nrow(d[duplicated(cbind(d$subjid, d$agedays)), ])
   d <- d[!duplicated(cbind(d$subjid, d$agedays)), ]
@@ -926,548 +1808,6 @@ WastIncCalc<-function(d, washout=60, dropBornWasted=F){
   
   return(d)
 }  
-
-
-
-
-
-
-#----------------------------------------------
-#Function to calculate summary tables
-#----------------------------------------------
-
-WastIncTable<-function(d, strat=T, agecats=c(6*30.4167, 12*30.4167, 18*30.4167, 24*30.4167), agecat_rownames=c("0-6 months","6-12 months", "12-18 months", "18-24 months")){
-  
-  
-  if(strat==T){
-    d$agecat <- as.factor(findInterval(d$agedays, agecats, rightmost.closed=F))
-  }  
-  
-  summary<-WastIncSummary(d, strat=strat)
-  tab<-summary[[1]]
-  means<-data.frame(strata=rep("Overall",nrow(summary[[2]])), summary[[2]])
-  
-  if(strat==T){
-    
-    strattab<-stratmeans<-NULL
-    for(i in 1:(length(agecats))){
-      temp<-WastIncSummary(d[d$agecat==(i-1),], strat=F)
-      strattab<-rbind(strattab, temp[[1]])
-      stratmeans<-rbind(stratmeans, data.frame(strata=rep(agecat_rownames[i],nrow(temp[[2]])), temp[[2]]))
-    }
-    stratmeans<-stratmeans[!is.na(stratmeans$Mean),]
-    
-    tab<-rbind(tab, strattab)
-    means<-rbind(means, stratmeans)
-    rownames(tab)<-c("Overall",agecat_rownames)
-    
-  }
-  
-  tf<-tab_format(tab)
-  
-  
-  
-  return(list(tab1=tf[[1]], tab2=tf[[2]], tab3=tf[[3]], tab=tf[[4]], means=means))
-  
-  
-}
-
-
-
-#----------------------------------------------
-#Function to calculate summary statistics
-#----------------------------------------------
-
-WastIncSummary<-function(d, strat=F){
-  require(epitools)
-  
-  d <- d %>% arrange(subjid, agedays)
-  
-  #Average number of measurements per child
-  child_nmeas <- d %>% group_by(subjid) %>%
-    summarize(num_measurements=n()) %>% ungroup() %>% 
-    summarize(num_children=n(),
-              num_measurements=mean(num_measurements))
-  
-  
-  #Overall sum and means
-  Incidence_df <- d %>% 
-    summarize(      
-      prev_wast= mean(whz < -2, na.rm=T) * 100,
-      prev_sevwast= mean(whz < -3, na.rm=T) * 100,
-      anywast= ifelse(sum(wast) > 0 ,1,0) * 100,
-      anysevwast= ifelse(sum(sevwast) > 0 ,1,0) * 100,
-      persontime=sum(pt_wast, na.rm=T),
-      sev_persontime=sum(pt_sevwast, na.rm=T),
-      recovery_persontime=sum(pt_wast_rec, na.rm=T),
-      sevrecovery_persontime=sum(pt_sevwast_rec, na.rm=T),
-      wast_ep=sum(wast_inc, na.rm=T),
-      sevwast_ep=sum(sevwast_inc, na.rm=T),
-      wast_rec_ep=sum(wast_rec, na.rm=T),
-      sevwast_rec_ep=sum(sevwast_rec, na.rm=T),
-      recoveries30d=sum(wast_rec30d==1, na.rm=T),
-      recoveries60d=sum(wast_rec60d==1, na.rm=T),
-      recoveries90d=sum(wast_rec90d==1, na.rm=T),
-      sevwast30d=sum(sevwast_inc30d==1, na.rm=T),
-      sevwast60d=sum(sevwast_inc60d==1, na.rm=T),
-      sevwast90d=sum(sevwast_inc90d==1, na.rm=T),
-      no_recoveries30d=sum(wast_rec30d==0, na.rm=T),
-      no_recoveries60d=sum(wast_rec60d==0, na.rm=T),
-      no_recoveries90d=sum(wast_rec90d==0, na.rm=T),
-      no_sevwast30d=sum(sevwast_inc30d==0, na.rm=T),
-      no_sevwast60d=sum(sevwast_inc60d==0, na.rm=T),
-      no_sevwast90d=sum(sevwast_inc90d==0, na.rm=T)
-    ) %>% 
-    mutate(  wastIR=wast_ep/persontime * 1000,
-             sevwastIR=sevwast_ep/sev_persontime * 1000,
-             wastrecIR=wast_rec_ep/recovery_persontime * 1000,
-             sevwastrecIR=sevwast_rec_ep/sevrecovery_persontime * 1000,
-             perc_wastrec_30d= sum(recoveries30d)/(sum(recoveries30d)+sum(no_recoveries30d))*100,
-             perc_wastrec_60d= sum(recoveries60d)/(sum(recoveries60d)+sum(no_recoveries60d))*100,
-             perc_wastrec_90d= sum(recoveries90d)/(sum(recoveries90d)+sum(no_recoveries90d))*100,
-             perc_sevwastinc_30d= sum(sevwast30d)/(sum(sevwast30d)+sum(no_sevwast30d)*100),
-             perc_sevwastinc_60d= sum(sevwast60d)/(sum(sevwast60d)+sum(no_sevwast60d)*100),
-             perc_sevwastinc_90d= sum(sevwast90d)/(sum(sevwast90d)+sum(no_sevwast90d)*100)
-    ) %>%
-    as.data.frame()
-  
-  #Calculate average episode lengths
-  episode_duration <- d %>% ungroup() %>%
-    filter(wast_inc==1) %>% #drop non-wasting periods
-    subset(., select=c(subjid,agecat,wasting_duration)) %>% 
-    as.data.frame()
-  
-  # #Calculate mean total duration of wasting per child
-  # note that this is among all children, not just kids who
-  # experience wasting, so kids who are never wasted have duration
-  # of 0, not NA.
-  duration <- episode_duration %>%
-    group_by(subjid) %>%
-    summarize(
-      total_duration= sum(wasting_duration, na.rm=T)
-    )
-  
-  
-  total_duration <- mean(duration$total_duration, na.rm=T)
-  average_duration <- mean(episode_duration$wasting_duration, na.rm=T)
-  
-  #Create taable of summary statistics
-  tab <- data.frame(child_nmeas, Incidence_df[1:4], total_duration, average_duration, Incidence_df[-c(1:4, 13:24)])
-  
-  #Calculate means
-  means <- NULL
-  try(
-    means <- rbind(
-      #longitudinal prevalence
-      mean95CI(Y=(d$whz < -2), id=d$subjid, proportion=T, percent=F),
-      mean95CI(Y=(d$whz < -3), id=d$subjid, proportion=T, percent=F),
-      #duration
-      mean95CI(Y=episode_duration$wasting_duration, id=episode_duration$subjid, proportion=F, percent=F),
-      #incidence rates
-      mean95CI(tab$wast_ep, persontime=tab$persontime, count=T) * c(1,rep(1000,5)),
-      mean95CI(tab$sevwast_ep, persontime=tab$sev_persontime, count=T) * c(1,rep(1000,5)),
-      mean95CI(tab$wast_rec_ep, persontime=tab$recovery_persontime, count=T) * c(1,rep(1000,5)),
-      mean95CI(tab$sevwast_rec_ep, persontime=tab$sevrecovery_persontime, count=T) * c(1,rep(1000,5)),
-      #percent recovery
-      mean95CI(Y=d$wast_rec30,  proportion=T, percent=F),
-      mean95CI(Y=d$wast_rec60,  proportion=T, percent=F),
-      mean95CI(Y=d$wast_rec90,  proportion=T, percent=F),
-      mean95CI(Y=d$sevwast_inc30d,  proportion=T, percent=F),
-      mean95CI(Y=d$sevwast_inc60d,  proportion=T, percent=F),
-      mean95CI(Y=d$sevwast_inc90d,  proportion=T, percent=F)))
-  
-  means <- data.frame(statistic =   c("Prevalence\nof\nwasting",
-                                      "Prevalence\nof\nsevere\nwasting",
-                                      "Average\nduration\nof\nwasting",
-                                      "Wasting\nincidence\nrate",
-                                      "Severe\nwasting\nincidence\nrate",
-                                      "Wasting\nrecovery\nincidence\nrate",
-                                      "Severe\nwasting\nrecovery\nincidence\nrate",
-                                      "Percent\nwasting\nrecovered\nin 30 days",
-                                      "Percent\nwasting\nrecovered\nin 60 days",
-                                      "Percent\nwasting\nrecovered\nin 90 days",
-                                      "Percent\nfalter to\nsevere\nwasting\nin 30 days",
-                                      "Percent\nfalter to\nsevere\nwasting\nin 60 days",
-                                      "Percent\nfalter to\nsevere\nwasting\nin 90 days"),means)
-  
-  return(list(tab, means))
-  #}
-}
-
-
-
-
-
-
-
-
-
-#----------------------------------------------
-#Function to format summary tables
-#----------------------------------------------
-tab_format <- function(tab){
-  
-  
-  tab<-as.data.frame(tab)
-  tab$`Child age stratification` <- rownames(tab)
-  tab1 <- tab %>% 
-    subset(., select=c(
-      `Child age stratification`,
-      num_children,
-      num_measurements,
-      prev_wast,
-      prev_sevwast,
-      anywast,
-      anysevwast,
-      #total_duration,
-      average_duration
-    )) %>%
-    rename( `Number of children` = num_children,
-            `Average number of measurements per child` = num_measurements,
-            `Prevalence of wasting across all measurements` =  prev_wast,
-            `Prevalence of severe wasting across all measurements` = prev_sevwast,
-            `Proportion of children who were ever wasted`= anywast,
-            `Proportion of children who were ever severely wasted` = anysevwast,
-            #`Total duration of wasting episodes (days)` = total_duration,
-            `Average duration of wasting episodes (days)` = average_duration)
-  
-  tab2 <- tab %>% 
-    subset(., select=c(
-      `Child age stratification`,
-      num_children,
-      num_measurements,
-      wast_ep,
-      sevwast_ep,
-      persontime,
-      sev_persontime,
-      wastIR,
-      sevwastIR
-    )) %>%
-    rename( `Number of children` = num_children,
-            `Average number of measurements per child` = num_measurements,
-            `Number of wasting episodes` = wast_ep,
-            `Number of severe wasting episodes` = sevwast_ep,
-            `No. of days at risk of wasting` = persontime,
-            `No. of days at risk of severe wasting` = sev_persontime,
-            `Wasting incidence rate per 1000 days` = wastIR,
-            `Severe wasting incidence rate per 1000 days` = sevwastIR
-    )
-  
-  
-  tab3 <- tab %>% 
-    subset(., select=c(
-      `Child age stratification`,
-      num_children,
-      num_measurements,
-      wast_rec_ep,
-      recovery_persontime,
-      wastrecIR,
-      perc_wastrec_30d,       
-      perc_wastrec_60d,
-      perc_wastrec_90d
-    )) %>%
-    rename( `Number of children` = num_children,
-            `Average number of measurements per child` = num_measurements,
-            `Number of recoveries from wasting` = wast_rec_ep,
-            `No. of days at eligible for wasting recovery` = recovery_persontime,
-            `Wasting recovery incidence rate per 1000 days` = wastrecIR,
-            `Percent of wasting episodes recovered from in 30 days` = perc_wastrec_30d,       
-            `Percent of wasting episodes recovered from in 60 days` = perc_wastrec_60d,
-            `Percent of wasting episodes recovered from in 90 days` = perc_wastrec_90d)
-  return(list(tab1,tab2,tab3, tab))
-}
-
-
-
-
-
-
-
-
-
-
-
-
-#---------------------------------------
-# Plot parameters
-#---------------------------------------
-#Plot themes
-theme_set(theme_bw())
-
-#hbgdki pallet
-tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
-               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
-
-
-
-
-#---------------------------------------
-# fit.rma function
-#---------------------------------------
-
-# random effects function, save results nicely
-fit.rma=function(data,age,ni,xi,measure,nlab){
-  data=filter(data,agecat==age)
-  
-  if(measure=="PLO"){
-     if(nrow(data)==1){
-       data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
-       data$se <- sqrt(data$vi)
-       
-       out=data %>% 
-         ungroup() %>%
-         mutate(nstudies=1, nmeas=data[[ni]]) %>%
-         mutate(agecat=age,est=plogis(yi), lb=plogis(yi-1.96*se), ub=plogis(yi+1.96*se),
-                nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),  " ",nlab),
-                nstudy.f=paste0("N=",nstudies," studies")) %>%
-         select(nstudies, nmeas,    agecat ,     est,        se,        lb,        ub ,          nmeas.f,     nstudy.f) %>%
-         as.tibble()
-       rownames(out) <- NULL
-     }else{
-       if(sum(data[[xi]])==0){
-         fit<-rma(ni=data[[ni]], xi=data[[xi]], 
-                  method="FE", measure="PLO") #Use FE model if all 0 counts because no heterogeneity and rma.glmm fails
-       }else{
-       fit<-rma.glmm(ni=data[[ni]], xi=data[[xi]], measure="PLO") 
-       }
-    out=data %>%
-      ungroup() %>%
-      summarise(nstudies=length(unique(studyid)),
-                nmeas=sum(data[[ni]][agecat==age])) %>%
-      #mutate(agecat=age,est=exp(fit$beta), se=fit$se, lb=exp(fit$beta-1.96*fit$se), ub=exp(fit$beta+1.96*fit$se),
-      mutate(agecat=age,est=plogis(fit$beta), se=fit$se, lb=plogis(fit$beta-1.96*fit$se), ub=plogis(fit$beta+1.96*fit$se),
-             nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),  " ",nlab),
-             nstudy.f=paste0("N=",nstudies," studies")) %>% as.tibble()
-    rownames(out) <- NULL
-     }
-  }else{
-    if(measure!="IR"){
-      fit<-rma(ni=data[[ni]], xi=data[[xi]], 
-               method="REML", measure=measure)
-    }else{
-      fit<-rma(ti=data[[ni]], xi=data[[xi]], 
-               method="REML", measure=measure, to="if0all")
-    }
-    out=data %>%
-      ungroup() %>%
-      summarise(nstudies=length(unique(studyid)),
-                nmeas=sum(data[[ni]][agecat==age])) %>%
-      mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
-             nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
-                            " ",nlab),
-             nstudy.f=paste0("N=",nstudies," studies"))
-  }
-  return(out)
-
-}
-
-
-
-# random effects function, save results nicely
-fit.cont.rma=function(data,age,yi,vi,ni,nlab){
-  
-  data=filter(data,agecat==age)
-  
-  fit <- NULL
-  try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="REML", measure = "GEN"))
-  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="ML", measure = "GEN"))}
-  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="DL", measure = "GEN"))}
-  if(is.null(fit)){try(fit <- rma(yi=data[[yi]], vi=data[[vi]], method="HE", measure = "GEN"))}
-  
-  out = data %>%
-    ungroup() %>%
-    summarise(nstudies=length(unique(studyid)),
-              nmeas=sum(data[[ni]][agecat==age])) %>%
-    mutate(agecat=age,est=fit$beta, se=fit$se, lb=fit$ci.lb, ub=fit$ci.ub,
-           nmeas.f=paste0("N=",format(sum(data[[ni]]),big.mark=",",scientific=FALSE),
-                          " ",nlab),
-           nstudy.f=paste0("N=",nstudies," studies"))
-  return(out)
-}
-
-
-
-
-
-sem<-function(x){
-  sd(x)/sqrt(length(x))
-}
-
-
-
-
-
-#---------------------------------------
-# fit.escalc function
-#---------------------------------------
-
-# calc individual cohort PR variances, standard errors, and 95% CI from the rma() arguements, and append to dataset
-# Input:
-# meas: PR for prevalence, CI for cumulative incidence, and IR for incidence rate
-# PLO for log transformed prevalence (to prevent 95% CI outside 0 and 1).
-
-#Returns:
-# Inputted dataframe with appended columns
-# yi = outcome of interest
-# vi = variance of outcome
-# se = standard error
-# ci.lb = lower bound of 95% confidence interval
-# ci.ub = upper bound of 95% confidence interval
-
-fit.escalc<-function(data,age,ni,xi, meas){
-  data=filter(data,agecat==age)
-  
-  if(meas=="PLO"){
-    data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
-    data$se <- sqrt(data$vi)
-    data$ci.lb <- plogis(data$yi - 1.96 * data$se)
-    data$ci.ub <- plogis(data$yi + 1.96 * data$se)
-    data$yi <- plogis(data$yi)
-    
-  }else{
-    
-    if(meas=="PR"){
-      data<-escalc(data=data, ni=data[[ni]], xi=data[[xi]], method="REML", measure="PLO", append=T)
-    }
-    
-    if(meas=="IR"){
-      data<-escalc(data=data, ti=data[[ni]], xi=data[[xi]], method="REML", measure="IR", append=T)
-    }
-    
-    data$se <- sqrt(data$vi)
-    data$ci.lb <- data$yi - 1.96 * data$se
-    data$ci.ub <- data$yi + 1.96 * data$se
-  }
-  return(data)
-}
-
-
-fit.escalc.cont <- function(data,age,yi,vi, meas){
-  data=filter(data,agecat==age)
-  
-  data <- data.frame(data, escalc(yi=data[[yi]], vi=data[[vi]], method="REML", measure="GEN"))
-  
-  data$se <- sqrt(data$vi)
-  data$ci.lb <- data$yi - 1.96 * data$se 
-  data$ci.ub <- data$yi + 1.96 * data$se 
-  
-  return(data)
-}
-
-
-#---------------------------------------
-# cohort-specific output formatting
-#---------------------------------------
-# if percentage, multiply est and ci by 100
-# create cohort name for plotting
-# create region variable 
-# add age labels for x-axis
-
-# Input:
-# data frame with fit.escalc output 
-# vector of labels for plotting
-
-#Returns:
-# data frame formatted for plotting cohort specific results
-cohort.format=function(df, lab, y, est="percent"){
-  y = as.numeric(y)
-  
-  # rescale percentages
-  if(est=="percent"){
-    df = df %>% mutate(y=y*100,ci.lb=ci.lb*100,ci.ub=ci.ub*100)
-  }
-  if(est=="rate"){
-    df = df %>% mutate(y=y*1000,ci.lb=ci.lb*1000,ci.ub=ci.ub*1000)
-  }
-  
-  # cohort name
-  df = df %>% mutate(cohort=paste0(studyid,"-",country)) %>%
-    mutate(cohort=gsub("ki[^-]*-","",cohort))
-  
-  # region variable
-  df <- df %>% mutate(region = case_when(
-    country=="BANGLADESH" | country=="INDIA"|
-      country=="NEPAL" | country=="PAKISTAN"|
-      country=="PHILIPPINES"                   ~ "Asia", 
-    country=="KENYA"|
-      country=="GHANA"|
-      country=="BURKINA FASO"|
-      country=="GUINEA-BISSAU"|
-      country=="MALAWI"|
-      country=="SOUTH AFRICA"|
-      country=="TANZANIA, UNITED REPUBLIC OF"|
-      country=="ZIMBABWE"|
-      country=="GAMBIA"                       ~ "Africa",
-    country=="BELARUS"                      ~ "Europe",
-    country=="BRAZIL" | country=="GUATEMALA" |
-      country=="PERU"                         ~ "Latin America",
-    TRUE                                    ~ "Other"
-  ))
-  
-  # create formatted age categories for plotting 
-  df <- df %>%  mutate(agecat=droplevels(as.factor(agecat)))
-  df <- df %>%  mutate(age.f = factor(agecat,levels=levels(df$agecat),
-                                      labels=lab))
-  
-  return(df)
-}
-
-
-
-
-
-
-
-# Multiple plot function
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-
-
-
-
 
 
 

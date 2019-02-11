@@ -130,10 +130,34 @@ table(d$ever_co06, d$dead)
 table(d$ever_co024, d$dead)
 
 
-
-
 #Drop studies with no mortality information
 d <- d %>% filter(tot_dead>0)
+
+#Set exposures to factors
+Avars <- c("ever_wasted06",
+           "ever_swasted06",
+           "pers_wasted06",
+           "ever_stunted06",
+           "ever_sstunted06",
+           "ever_wasted024",
+           "ever_swasted024",
+           "pers_wasted024",
+           "ever_stunted024",
+           "ever_sstunted024",
+           "ever_wasted06_noBW",
+           "ever_swasted06_noBW",
+           "ever_wasted024_noBW",
+           "ever_swasted024_noBW",
+           "ever_underweight06",
+           "ever_sunderweight06",
+           "ever_underweight024",
+           "ever_sunderweight024",
+           "ever_co06",
+           "ever_co024")
+
+for(i in Avars){
+  d[,i] <- factor(d[,i])
+}
 
 
 saveRDS(d, file="U:/UCB-SuperLearner/Wasting rallies/stuntwast_mort.rds")
@@ -180,6 +204,24 @@ table(d$ever_underweight06, d$co_occurence)
 table(d$ever_co06, d$co_occurence)
 
 
+#Drop studies with no mortality information
+d <- d %>% filter(tot_dead>0)
+
+#Set exposures to factors
+Avars_morbidity <- c("ever_wasted06",
+                     "ever_swasted06",
+                     "pers_wasted06",
+                     "ever_stunted06",
+                     "ever_sstunted06",
+                     "ever_wasted06_noBW",
+                     "ever_swasted06_noBW",
+                     "ever_underweight06",
+                     "ever_sunderweight06",
+                     "ever_co06")
+
+for(i in Avars_morbidity){
+  d[,i] <- factor(d[,i])
+}
 
 
 save(d, file="U:/UCB-SuperLearner/Wasting rallies/stuntwast_morbidity.Rdata")

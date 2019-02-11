@@ -36,7 +36,7 @@ save(d_noRec, d_noBW_noRec, file="U:/Data/Wasting/Wasting_inc_noRec_data.RData")
 
 # Calculate incidence in the intervention dataset with yearly-measured studies
 load("U:/Data/Wasting/int_wasting_data.RData")
-dfstunt <- df_int <- d
+df_int <- d
 d_int <- df_int %>% group_by(studyid, country) %>% do(WastIncCalc(.))
 d_int_noBW <- df_int %>% group_by(studyid, country) %>% do(WastIncCalc(., dropBornWasted=T))
 save(d_int, d_int_noBW, file="U:/Data/Wasting/Wast_int_inc_data.RData")
@@ -44,9 +44,10 @@ save(d_int, d_int_noBW, file="U:/Data/Wasting/Wast_int_inc_data.RData")
 
 
 #Calculate incidence of stunting
-dfstunt$whz <- dfstunt$haz
-dstunt_noBW <- dfstunt %>% group_by(studyid, country) %>% do(WastIncCalc(., dropBornWasted=T, washout = 60)) 
-dstunt <- dfstunt %>% group_by(studyid, country) %>% do(WastIncCalc(., washout=1000)) 
+load("U:/Data/Stunting/stunting_data.RData")
+dfstunt <- d
+dstunt_noBW <- dfstunt %>% group_by(studyid, country) %>% do(WastIncCalc(., stunt=T, dropBornWasted=T, washout = 60)) 
+dstunt <- dfstunt %>% group_by(studyid, country) %>% do(WastIncCalc(., stunt=T, washout=1000)) 
 
 
 

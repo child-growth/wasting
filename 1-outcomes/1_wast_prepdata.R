@@ -22,6 +22,21 @@ d<-fread("U:/data/FINAL/UCB Rally7/Main/adam/FINAL.csv", header = T)
 colnames(d) <- tolower(colnames(d))
 d<-d %>% subset(., select=c(studyid, subjid, country, tr, agedays, month, whz, haz, waz))
 
+
+#--------------------------------------------
+#Merge cleaned covariates for full analysis dataset
+#--------------------------------------------
+
+#load covariates
+cov<-readRDS("U:/ucb-superlearner/stunting rallies/FINAL_clean_covariates.rds")
+dim(cov)
+dim(d)
+d$subjid <- as.character(d$subjid)
+df <- left_join(d, cov, by=c("studyid", "subjid", "country"))
+dim(df)
+
+saveRDS(df,"U:/sprint_7D_longbow/KI_full_data.rds")
+
 #--------------------------------------------
 #Check for duplicate agedays
 #--------------------------------------------

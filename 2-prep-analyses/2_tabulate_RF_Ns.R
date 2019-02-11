@@ -7,7 +7,6 @@ library(reshape2)
 
 #merge outcomes with covariates
 
-# setwd("U:/UCB-SuperLearner/Stunting rallies/")
 setwd("U:/UCB-SuperLearner/Wasting rallies/")
 
 #load covariates
@@ -23,26 +22,26 @@ load("wast_rec.rdata")
 
 dim(prev)
 dim(cuminc)
-dim(rev)
+dim(rec)
 dim(vel_haz)
 
 
 colnames(prev)
 colnames(cuminc)
-colnames(rev)
+colnames(rec)
 colnames(vel_haz)
 
 
 head(prev)
 head(cuminc)
-head(rev)
+head(rec)
 head(vel_haz)
 
 #convert subjid to character for the merge with covariate dataset
 cov$subjid <- as.character(cov$subjid)
 prev$subjid <- as.character(prev$subjid)
 cuminc$subjid <- as.character(cuminc$subjid)
-rev$subjid <- as.character(rev$subjid)
+rec$subjid <- as.character(rec$subjid)
 pers_wast$subjid <- as.character(pers_wast$subjid)
 
 
@@ -63,7 +62,7 @@ A<-c( "sex", "gagebrth",      "birthwt",
 dfull <- d
 
 #Create a risk factor tabulation function
-RF_tab <- function(d, Yvar="ever_stunted", statistic="N", A=c( "sex",              "gagebrth",      "birthwt",      
+RF_tab <- function(d, Yvar="ever_wasted", statistic="N", A=c( "sex",              "gagebrth",      "birthwt",      
                                   "birthlen",      "enstunt",       "vagbrth",       "hdlvry",        "mage",          "mhtcm",         "mwtkg",        
                                   "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
                                   "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
@@ -131,7 +130,7 @@ RF_tab <- function(d, Yvar="ever_stunted", statistic="N", A=c( "sex",           
 #merge in covariates
 prev <- left_join(prev, cov, by=c("studyid", "subjid", "country"))
 cuminc <- left_join(cuminc, cov, by=c("studyid", "subjid", "country"))
-rev <- left_join(rev, cov, by=c("studyid", "subjid", "country"))
+rec <- left_join(rec, cov, by=c("studyid", "subjid", "country"))
 pers_wast <- left_join(pers_wast, cov, by=c("studyid", "subjid", "country"))
 
 
@@ -151,22 +150,12 @@ cumincCase_06 <- RF_tab(cuminc[cuminc$agecat=="0-6 months",], statistic="N_cases
 
 
 table(prev$agecat)
-prevN_birth <- RF_tab(prev[prev$agecat=="Birth",], Yvar="stunted")
-prevCase_birth <- RF_tab(prev[prev$agecat=="Birth",], Yvar="stunted", statistic="N_cases")
-prevN_6 <- RF_tab(prev[prev$agecat=="6 months",], Yvar="stunted")
-prevCase_6 <- RF_tab(prev[prev$agecat=="6 months",], Yvar="stunted", statistic="N_cases")
-prevN_24 <- RF_tab(prev[prev$agecat=="24 months",], Yvar="stunted")
-prevCase_24 <- RF_tab(prev[prev$agecat=="24 months",], Yvar="stunted", statistic="N_cases")
-
-table(vel_haz$agecat)
-vel_hazN_03 <- RF_tab(vel_haz[vel_haz$agecat=="0-3 months",], Yvar="y_rate")
-vel_hazMean_03 <- RF_tab(vel_haz[vel_haz$agecat=="0-3 months",], Yvar="y_rate", statistic="mean")
-vel_hazN_36 <- RF_tab(vel_haz[vel_haz$agecat=="3-6 months",], Yvar="y_rate")
-vel_hazMean_36 <- RF_tab(vel_haz[vel_haz$agecat=="3-6 months",], Yvar="y_rate", statistic="mean")
-vel_hazN_612 <- RF_tab(vel_haz[vel_haz$agecat=="6-12 months",], Yvar="y_rate")
-vel_hazMean_612 <- RF_tab(vel_haz[vel_haz$agecat=="6-12 months",], Yvar="y_rate", statistic="mean")
-vel_hazN_1224 <- RF_tab(vel_haz[vel_haz$agecat=="12-24 months",], Yvar="y_rate")
-vel_hazMean_1224 <- RF_tab(vel_haz[vel_haz$agecat=="12-24 months",], Yvar="y_rate", statistic="mean")
+prevN_birth <- RF_tab(prev[prev$agecat=="Birth",], Yvar="wasted")
+prevCase_birth <- RF_tab(prev[prev$agecat=="Birth",], Yvar="wasted", statistic="N_cases")
+prevN_6 <- RF_tab(prev[prev$agecat=="6 months",], Yvar="wasted")
+prevCase_6 <- RF_tab(prev[prev$agecat=="6 months",], Yvar="wasted", statistic="N_cases")
+prevN_24 <- RF_tab(prev[prev$agecat=="24 months",], Yvar="wasted")
+prevCase_24 <- RF_tab(prev[prev$agecat=="24 months",], Yvar="wasted", statistic="N_cases")
 
 
 table(pers_wast$agecat)
@@ -196,16 +185,15 @@ save(cumincN_024,
      prevN_6, 
      prevCase_6, 
      prevN_24, 
-     prevCase_24, 
-     vel_hazN_03, 
-     vel_hazMean_03, 
-     vel_hazN_36, 
-     vel_hazMean_36, 
-     vel_hazN_612,
-     vel_hazMean_612, 
-     vel_hazN_1224,
-     vel_hazMean_1224, 
+     prevCase_24,
+     pers_wastN_024,
+     pers_wastCase_024,
+     pers_wastN_624,
+     pers_wastCase_624,
+     pers_wastN_06,
+     pers_wastCase_06,
      file="U:/ucb-superlearner/Stunting rallies/wast_RiskFactor_Ns.Rdata")
+
 
 
 
