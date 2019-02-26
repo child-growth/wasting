@@ -8,12 +8,27 @@
 #-----------------------------------
 rm(list=ls())
 library(tidyverse)
+library(metafor)
+library(data.table)
 
+source("U:/Wasting/1-outcomes/0_wast_incfunctions.R")
 
 
 load("U:/Data/Wasting/Wasting_inc_data.RData")
 load("U:/Data/Wasting/Stunting_inc_data.RData")
 
+
+#--------------------------------------
+# Calculate monthly mean WHZ for the
+# risk factor analysis
+#--------------------------------------
+monthly_whz <- calc.monthly.agecat(d)
+monthly_whz <- monthly_whz %>% subset(., select=c(subjid,studyid,country,agecat,region, measurefreq, whz))
+monthly_whz <- monthly_whz %>%
+  filter(!is.na(agecat)) %>%
+  group_by(studyid,country,subjid,agecat,measurefreq) %>%
+  summarise(whz=mean(whz))
+save(monthly_whz, file="U:/ucb-superlearner/Wasting rallies/monthly_whz.rdata")
 
 #--------------------------------------
 # Calculate prevalence of

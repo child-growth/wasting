@@ -149,8 +149,8 @@ monthly.whz <- bind_rows(
 #Cumulative inc
 d <- calc.ci.agecat(d, range = 6)
 agelst = list("0-6 months", "6-12 months", "12-18 months", "18-24 months")
-ci.data <- summary.ci(d, agelist = agelst)
-ci.region <- d %>% group_by(region) %>% do(summary.ci(., agelist = agelst)$ci.res)
+ci.data <- summary.incprop(d, agelist = agelst)
+ci.region <- d %>% group_by(region) %>% do(summary.incprop(., agelist = agelst)$ci.res)
 ci.cohort <-
   ci.data$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -173,8 +173,8 @@ agelst3 = list(
   "18-21 months",
   "21-24 months"
 )
-ci.data3 <- summary.ci(d3, agelist = agelst3)
-ci.region3 <- d3 %>% group_by(region) %>% do(summary.ci(., agelist = agelst3)$ci.res)
+ci.data3 <- summary.incprop(d3, agelist = agelst3)
+ci.region3 <- d3 %>% group_by(region) %>% do(summary.incprop(., agelist = agelst3)$ci.res)
 ci.cohort3 <-
   ci.data3$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -189,9 +189,9 @@ ci_3 <- bind_rows(
 
 #Cumulative inc, no birth
 d_noBW <- calc.ci.agecat(d_noBW, range = 6)
-ci.data.nobirth <- summary.ci(d_noBW, agelist = agelst)
+ci.data.nobirth <- summary.incprop(d_noBW, agelist = agelst)
 ci.region.nobirth <-
-  d %>% group_by(region) %>% do(summary.ci(., agelist = agelst)$ci.res)
+  d %>% group_by(region) %>% do(summary.incprop(., agelist = agelst)$ci.res)
 ci.cohort.nobirth <-
   ci.data.nobirth$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -215,9 +215,9 @@ agelst3 = list(
   "18-21 months",
   "21-24 months"
 )
-ci.data.nobirth3 <- summary.ci(d3, agelist = agelst3)
+ci.data.nobirth3 <- summary.incprop(d3, agelist = agelst3)
 ci.region.nobirth3 <-
-  d3 %>% group_by(region) %>% do(summary.ci(., agelist = agelst3)$ci.res)
+  d3 %>% group_by(region) %>% do(summary.incprop(., agelist = agelst3)$ci.res)
 ci.cohort.nobirth3 <-
   ci.data.nobirth3$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -236,8 +236,8 @@ ci_nobw3 <- bind_rows(
 #Cumulative inc of severe wasting
 d <- calc.ci.agecat(d, range = 6)
 agelst = list("0-6 months", "6-12 months", "12-18 months", "18-24 months")
-sev.ci.data <- summary.ci(d, agelist = agelst, severe.wasted = T)
-sev.ci.region <- d %>% group_by(region) %>% do(summary.ci(., agelist = agelst, severe.wasted = T)$ci.res)
+sev.ci.data <- summary.incprop(d, agelist = agelst, severe.wasted = T)
+sev.ci.region <- d %>% group_by(region) %>% do(summary.incprop(., agelist = agelst, severe.wasted = T)$ci.res)
 sev.ci.cohort <-
   sev.ci.data$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -252,7 +252,7 @@ sev.ci <- bind_rows(
 
 #Recovery cumulative inc
 #NOTE: need to make sure to only include those wasted in the denominator
-#rec.data <- summary.ci(d, recovery = T)
+#rec.data <- summary.incprop(d, recovery = T)
 
 #Incidence rate
 ir.data <- summary.ir(d, agelist = agelst)
@@ -301,7 +301,8 @@ sev.ir <- bind_rows(
 #rec.ir.data.d_noBW <- summary.ir(d_noBW, recovery = T)
 
 #Duration
-#dur.data <- summary.dur(d)
+dur.data <- summary.dur(d, agelist=list("0-6 months",  "6-12 months","12-18 months","18-24 months"))
+dur.region <- d %>% group_by(region) %>% do(summary.dur(., agelist=list("0-6 months",  "6-12 months","12-18 months","18-24 months")))
 
 #Recovery within 30, 60, 90 days
 d <- calc.ci.agecat(d, range = 6)
@@ -369,8 +370,8 @@ agelst3 = list(
   "18-21 months",
   "21-24 months"
 )
-ci.data3 <- summary.ci(d3, agelist = agelst3)
-ci.region3 <- d3 %>% group_by(region) %>% do(summary.ci(., agelist = agelst3)$ci.res)
+ci.data3 <- summary.incprop(d3, agelist = agelst3)
+ci.region3 <- d3 %>% group_by(region) %>% do(summary.incprop(., agelist = agelst3)$ci.res)
 ci.cohort3 <-
   ci.data3$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -383,8 +384,8 @@ ci_3_noRec <- bind_rows(
 
 
 #Cumulative inc of severe wasting
-sev.ci.data <- summary.ci(d3, agelist = agelst3, severe.wasted = T)
-sev.ci.region <- d3 %>% group_by(region) %>% do(summary.ci(., agelist = agelst3, severe.wasted = T)$ci.res)
+sev.ci.data <- summary.incprop(d3, agelist = agelst3, severe.wasted = T)
+sev.ci.region <- d3 %>% group_by(region) %>% do(summary.incprop(., agelist = agelst3, severe.wasted = T)$ci.res)
 sev.ci.cohort <-
   sev.ci.data$ci.cohort %>% subset(., select = c(cohort, region, agecat,  yi,  ci.lb,  ci.ub)) %>%
   rename(est = yi,  lb = ci.lb,  ub = ci.ub)
@@ -413,6 +414,32 @@ ir_noRec <- bind_rows(
 
 
 
+# Cumulative Incidence 
+d3 <- calc.ci.agecat(d, range = 3)
+agelst3 = list(
+  "0-3 months",
+  "3-6 months",
+  "6-9 months",
+  "9-12 months",
+  "12-15 months",
+  "15-18 months",
+  "18-21 months",
+  "21-24 months"
+)
+ci.data3 <- summary.ci(d3, agelist = agelst3)
+ci.region3 <- d3  %>% group_by(region) %>% do(summary.ci(., agelist = agelst3)$ci.res)
+ci.cohort3 <-
+  ci.data3$ci.cohort %>% subset(., select = c(cohort, region, agecat, nchild,  yi,  ci.lb,  ci.ub)) %>%
+  rename(est = yi,  lb = ci.lb,  ub = ci.ub, nmeas=nchild)
+
+
+cuminc <- bind_rows(
+  data.frame(cohort = "pooled", region = "Overall", ci.data3$ci.res),
+  data.frame(cohort = "pooled", ci.region3),
+  ci.cohort3
+)
+
+
 
 
 
@@ -422,11 +449,12 @@ shiny_desc_data <- bind_rows(
   data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="yes", measure= "Prevalence", sev.prev),
   data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="no", measure= "Mean WLZ",  whz),
   data.frame(disease = "Wasting", age_range="1 month",   birth="yes", severe="no", measure= "Mean WLZ",  monthly.whz),
-  data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="no", measure= "Cumulative incidence", ci),
-  data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="no", measure= "Cumulative incidence", ci_3),
-  data.frame(disease = "Wasting", age_range="6 months",   birth="no",  severe="no",   measure= "Cumulative incidence",  ci_nobw),
-  data.frame(disease = "Wasting", age_range="3 months",   birth="no",  severe="no",   measure= "Cumulative incidence",  ci_nobw3),
-  data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="yes", measure= "Cumulative incidence",  sev.ci),
+  data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="no", measure= "Incidence proportion", ci),
+  data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="no", measure= "Incidence proportion", ci_3),
+  data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="no", measure= "Cumulative incidence", cuminc),
+  data.frame(disease = "Wasting", age_range="6 months",   birth="no",  severe="no",   measure= "Incidence proportion",  ci_nobw),
+  data.frame(disease = "Wasting", age_range="3 months",   birth="no",  severe="no",   measure= "Incidence proportion",  ci_nobw3),
+  data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="yes", measure= "Incidence proportion",  sev.ci),
   data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="no", measure= "Incidence rate",  ir),
   data.frame(disease = "Wasting", age_range="6 months",   birth="no", severe="no", measure= "Incidence rate",  ir_noBW),
   data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="yes", measure= "Incidence rate",  sev.ir),
@@ -434,15 +462,15 @@ shiny_desc_data <- bind_rows(
   data.frame(disease = "Wasting", age_range="30 days",   birth="yes", severe="no", measure= "Recovery", rec30),
   data.frame(disease = "Wasting", age_range="60 days",   birth="yes", severe="no", measure= "Recovery", rec60),
   data.frame(disease = "Wasting", age_range="90 days",   birth="yes", severe="no", measure= "Recovery", rec90),
-  data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="no", measure= "Cumulative incidence - no recovery", ci_3_noRec),
-  data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="yes", measure= "Cumulative incidence - no recovery", sev.ci_noRec),
+  data.frame(disease = "Wasting", age_range="3 months",   birth="yes", severe="no", measure= "Incidence proportion - no recovery", ci_3_noRec),
+  data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="yes", measure= "Incidence proportion - no recovery", sev.ci_noRec),
   data.frame(disease = "Wasting", age_range="6 months",   birth="yes", severe="no", measure= "Incidence rate - no recovery", ir_noRec)
 )
 
 
 
 
-shiny_desc_data <- shiny_desc_data %>% subset(., select = -c(se, nmeas.f,  ptest.f, pt.f))
+shiny_desc_data <- shiny_desc_data %>% subset(., select = -c(se,  ptest.f, pt.f))
 
 unique(shiny_desc_data$agecat)
 shiny_desc_data$agecat <- factor(shiny_desc_data$agecat, levels=unique(shiny_desc_data$agecat))

@@ -26,6 +26,7 @@ load("pers_wast.rdata")
 load("wast_rec.rdata")
 load("birthanthro_cuminc.rdata")
 load("waz_vel_rf_outcomes.RData")
+load("monthly_whz.rdata")
 
 
 #convert subjid to character for the merge with covariate dataset
@@ -37,7 +38,44 @@ rec$subjid <- as.character(rec$subjid)
 pers_wast$subjid <- as.character(pers_wast$subjid)
 birthanthro_ci$subjid <- as.character(birthanthro_ci$subjid)
 vel_waz$subjid <- as.character(vel_waz$subjid)
+monthly_whz$subjid <- as.character(monthly_whz$subjid)
 
+
+#------------------------------------
+# Create monthly WHZ dataset
+#------------------------------------
+
+#merge in covariates
+dim(monthly_whz)
+dim(cov)
+d <- left_join(monthly_whz, cov, by=c("studyid", "subjid", "country"))
+dim(d)
+
+#Vector of outcome names
+Y<-c("whz")
+
+#Vector of risk factor names
+A<-c( "sex",              "gagebrth",      "birthwt",      
+      "birthlen",      "vagbrth",       "hdlvry",        "mage",          "mhtcm",         "mwtkg",        
+      "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
+      "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
+      "feducyrs", "hfoodsec",  
+      "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
+      "perdiar6", "perdiar24", "predexfd6", 
+      "predfeed3", "exclfeed3", "predfeed6", "exclfeed6", "predfeed36", "exclfeed36",
+      "earlybf")  
+
+#Vector of covariate names
+W<-c("")
+
+#Subgroup variable
+V <- c("agecat")
+
+#clusterid ID variable
+id <- c("id")
+
+
+save(d, Y, A,V, id,  file="mean_whz_rf.Rdata")
 
 
 #------------------------------------

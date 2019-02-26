@@ -1001,60 +1001,40 @@ summary.ir <- function(d, recovery=F, sev.wasting=F, agelist=list("0-3 months","
 }
 
 
-summary.dur <- function(d){
+summary.dur <- function(d, agelist){
   
   df <- d %>% 
-    group_by(studyid, country, agecat) %>% 
+    group_by(studyid, region, country, agecat) %>% 
     summarize(mean=mean(wasting_duration, na.rm=T), var=var(wasting_duration, na.rm=T), n=n()) %>%
     mutate(se=sqrt(var), ci.lb=mean - 1.96 * se, ci.ub=mean + 1.96 * se,
-           nmeas.f=paste0("N=",n," children")) %>% 
-    mutate(region = case_when(
-      country=="BANGLADESH" | country=="INDIA"|
-        country=="NEPAL" | country=="PAKISTAN"|
-        country=="PHILIPPINES"                   ~ "Asia", 
-      country=="BURKINA FASO"|
-        country=="GUINEA-BISSAU"|
-        country=="MALAWI"|
-        country=="KENYA"|
-        country=="GHANA"|
-        country=="SOUTH AFRICA"|
-        country=="TANZANIA, UNITED REPUBLIC OF"|
-        country=="ZIMBABWE"|
-        country=="GAMBIA"                       ~ "Africa",
-      country=="BELARUS"                      ~ "Europe",
-      country=="BRAZIL" | country=="GUATEMALA" |
-        country=="PERU"                         ~ "Latin America",
-      TRUE ~ "Other"
-    ),
-    country_cohort=paste0(studyid," ", country))
-    
+           nmeas.f=paste0("N=",n," children"))
   
-  pooled.vel=lapply(list("0-3 months", "3-6 months",  "6-9 months","9-12 months","12-15 months","15-18 months","18-21 months","21-24 months"),function(x) 
+  pooled.vel=lapply(agelist,function(x) 
     fit.cont.rma(data=df,yi="mean", vi="var", ni="n",age=x, nlab="children"))
   pooled.vel=as.data.frame(rbindlist(pooled.vel))
   
     pooled.vel$est <- as.numeric(pooled.vel$est)
     pooled.vel <- pooled.vel %>% 
-    mutate(country_cohort="pooled", pooled=1, region="Overall") %>% 
+    mutate(country_cohort="pooled", pooled=1) %>% 
   subset(., select = -c(se)) %>%
-  rename(strata=agecat, Mean=est, N=nmeas, Lower.95.CI=lb, Upper.95.CI=ub)
-    
+  rename(strata=agecat, Mean=est, N=nmeas, Lower.95.CI=lb, Upper.95.CI=ub) %>% as.data.frame()
+    print(pooled.vel)
      
-    cohort.df <- df %>% subset(., select = c(country_cohort, agecat, n, nmeas.f, mean, ci.lb, ci.ub, region)) %>%
+    cohort.df <- df %>% subset(., select = c(studyid, country, region, agecat, n, nmeas.f, mean, ci.lb, ci.ub)) %>%
       rename(N=n, Mean=mean, Lower.95.CI=ci.lb, Upper.95.CI=ci.ub,
              strata=agecat) %>%
       mutate(pooled=0, nstudies=1)
     
-  suppressWarnings(plotdf <- bind_rows(pooled.vel, cohort.df))
-  return(plotdf)
+    return(list(dur.data=df, dur.res=pooled.vel))
 }
 
 
-#stunitng reversal
+#stunting reversal
 
 summary.stunt.rev <- function(d){
   
-  d <- d %>% mutate(agem=agedays/30.4167)
+  d <- d %>% mutate(agem=round(agedays/30.4167))
+  
   
   # stunted by age x, recovered by age y
   # children with recovery=NA didn't have 2 measurements
@@ -1067,6 +1047,7 @@ summary.stunt.rev <- function(d){
   rec.1518=rec.age(data=d,s.agem=15,r.agem=18)
   rec.1821=rec.age(data=d,s.agem=18,r.agem=21)
   rec.2124=rec.age(data=d,s.agem=21,r.agem=24)
+
   
   # prepare data for pooling 
   rec.03.sum=summary_rev_df(rec.03, Age="0-3 months")

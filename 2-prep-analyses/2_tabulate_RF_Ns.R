@@ -4,6 +4,7 @@
 rm(list=ls())
 library(tidyverse)
 library(reshape2)
+library(data.table)
 
 #merge outcomes with covariates
 
@@ -19,6 +20,7 @@ load("wast_cuminc.rdata")
 load("wast_cuminc_nobirth.rdata")
 load("pers_wast.rdata")
 load("wast_rec.rdata")
+load("monthly_whz.rdata")
 
 dim(prev)
 dim(cuminc)
@@ -43,6 +45,7 @@ prev$subjid <- as.character(prev$subjid)
 cuminc$subjid <- as.character(cuminc$subjid)
 rec$subjid <- as.character(rec$subjid)
 pers_wast$subjid <- as.character(pers_wast$subjid)
+monthly_whz$subjid <- as.character(monthly_whz$subjid)
 
 
 #------------------------------------
@@ -62,15 +65,19 @@ A<-c( "sex", "gagebrth",      "birthwt",
 dfull <- d
 
 #Create a risk factor tabulation function
-RF_tab <- function(d, Yvar="ever_wasted", statistic="N", A=c( "sex",              "gagebrth",      "birthwt",      
+RF_tab <- function(d, Yvar="ever_wasted", statistic="N", age=NULL, A=c( "sex",              "gagebrth",      "birthwt",      
                                   "birthlen",      "enstunt",       "vagbrth",       "hdlvry",        "mage",          "mhtcm",         "mwtkg",        
                                   "mbmi",          "single",        "fage",          "fhtcm",         "nrooms",        "nhh",           "nchldlt5",     
                                   "hhwealth_quart", "month", "brthmon", "parity",   "meducyrs", 
                                   "feducyrs", "hfoodsec",  
                                   "trth2o", "cleanck", "impfloor",  "impsan", "safeh20",
                                   "perdiar6", "perdiar24", "predexfd6", "earlybf")){
-  
-  agecat <- d$agecat[1]    
+  if(is.null(age)){
+    agecat <- d$agecat[1]    
+  }else{
+    d <- d %>% filter(agecat==age)
+    agecat <- d$agecat[1]    
+  }
 
   
   d <- d %>% subset(., select=c("studyid",  "country", Yvar, A))
@@ -132,6 +139,7 @@ prev <- left_join(prev, cov, by=c("studyid", "subjid", "country"))
 cuminc <- left_join(cuminc, cov, by=c("studyid", "subjid", "country"))
 rec <- left_join(rec, cov, by=c("studyid", "subjid", "country"))
 pers_wast <- left_join(pers_wast, cov, by=c("studyid", "subjid", "country"))
+monthly_whz <- left_join(monthly_whz, cov, by=c("studyid", "subjid", "country"))
 
 
 
@@ -166,9 +174,34 @@ pers_wastCase_624 <- RF_tab(pers_wast[pers_wast$agecat=="6-24 months",], statist
 pers_wastN_06 <- RF_tab(pers_wast[pers_wast$agecat=="0-6 months",], Yvar="pers_wast.x")
 pers_wastCase_06 <- RF_tab(pers_wast[pers_wast$agecat=="0-6 months",], statistic="N_cases", Yvar="pers_wast.x")
 
+
+
 #------------------------------------
-# Convert to long form
+# plot N's by month
 #------------------------------------
+
+#Monthly N's
+whzN <- lapply(levels(monthly_whz$agecat), function(x) RF_tab(d=monthly_whz, Yvar="whz", statistic="N",age=x))
+whzN=as.data.frame(rbindlist(whzN))
+whzN <- whzN %>% filter(!is.na(N))
+head(whzN)
+
+p1 <- ggplot(monthly_whzN, aes(x=as.numeric(agecat), color=studyid, fill=studyid)) + geom_col(aes(y=N)) + facet_wrap(~intervention_variable) + theme(legend.position = "none")
+p1
+
+
+#Monthly N's
+monthly_whzN <- lapply(levels(monthly_whz$agecat[monthly_whz$measurefreq=="monthly"]), function(x) RF_tab(d=monthly_whz[monthly_whz$measurefreq=="monthly",], Yvar="whz", statistic="N",age=x))
+monthly_whzN=as.data.frame(rbindlist(monthly_whzN))
+monthly_whzN <- monthly_whzN %>% filter(!is.na(N))
+head(monthly_whzN)
+
+p2 <- ggplot(monthly_whzN, aes(x=as.numeric(agecat), color=studyid, fill=studyid)) + geom_col(aes(y=N)) + facet_wrap(~intervention_variable) + theme(legend.position = "none")
+p2
+
+ggsave(p1, file="U:/Figures/Nobs_per_RF_quarterly.png")
+ggsave(p2, file="U:/Figures/Nobs_per_RF_monthly.png")
+
 
 #------------------------------------
 # Save tabulated objects
@@ -192,6 +225,8 @@ save(cumincN_024,
      pers_wastCase_624,
      pers_wastN_06,
      pers_wastCase_06,
+     whzN,
+     monthly_whzN,
      file="U:/ucb-superlearner/Stunting rallies/wast_RiskFactor_Ns.Rdata")
 
 
