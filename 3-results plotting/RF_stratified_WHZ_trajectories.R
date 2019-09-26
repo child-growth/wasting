@@ -250,56 +250,111 @@ ggsave(gt1, file="U:/Figures/Stunting Webinar/season_WLZ_trajectories.png", widt
 
 
 
+#Add overall spline
+plotdf3 <- plotdf2 <- plotdf
+plotdf2$cohort <- "Cohort"
+plotdf3$cohort <- plotdf3$studyid <- ""
+plotdf2 <- rbind(plotdf2, plotdf3)
+plotdf2$cohort <- factor(plotdf2$cohort, levels=c("","Cohort"))
 
-
-
-
-
-
-df$countrycohort<-paste0(df$studyid,df$country)
-
-plotdf <- df
-plotdf$highlight <- 1
-
-plotdf <- plotdf %>% rename(Month=month)
-plotdf$studyid[plotdf$studyid=="GMS-Nepal, Nepal"] <- "GMS-Nepal"
-plotdf$studyid[plotdf$studyid=="CMC-V-BCS-2002, India"] <- "CMC, India"
-plotdf$studyid <- gsub("Bangladesh","BD",plotdf$studyid)
-
-
-p<-ggplot(plotdf, aes(x=Month, y=whz, group=factor(studyid), color=factor(studyid))) + 
+p_asia<-ggplot(plotdf2, aes(x=Month, y=whz, group=factor(studyid), color=factor(cohort), linetype=factor(cohort), size=factor(cohort))) + 
   geom_smooth(method = 'loess',se = FALSE) +
-  facet_wrap(~region) +
   coord_cartesian(ylim=c(0,-1.35), xlim=c(1,12)) +
   scale_x_continuous(breaks=c(1:12), labels= monthlabs, expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0)) +
-  scale_color_manual(values=rep(tableau10[c(1,3,4,2,5:10)],20),name = "Cohort") +
-  scale_size(range=c(1, 2), guide=FALSE) +
-  xlab("Month of measurement") + ylab("WLZ") + 
-  ggtitle("Example: WLZ over season in South Asian cohorts") + 
+  scale_color_manual(values=c(tableau10[3], "#4d4d4d")) +
+  scale_size_manual(values=c(3,1), guide=FALSE) +
+  xlab("Month of measurement") + ylab("Mean WLZ") + 
+  ggtitle("WLZ over season in South Asian cohorts") + 
   theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12),
         plot.margin = unit(c(1,6,1,1), "lines")) 
 
 
-library(data.table)
-smooth_dat <- setDT(ggplot_build(p)$data[[1]])
+
+# p_asia<-ggplot() + 
+#   geom_smooth(data=plotdf, aes(x=Month, y=whz), color=tableau10[3], method = 'loess',se = FALSE, size=3) +
+#   geom_smooth(data=plotdf, aes(x=Month, y=whz, group=factor(studyid)), linetype="dashed",  color="grey30", method = 'loess',se = FALSE) +
+#   coord_cartesian(ylim=c(0,-1.35), xlim=c(1,12)) +
+#   scale_x_continuous(breaks=c(1:12), labels= monthlabs, expand=c(0,0)) +
+#   scale_y_continuous(expand=c(0,0)) +
+#   scale_size(range=c(1, 2), guide=FALSE) +
+#   xlab("Month of measurement") + ylab("WLZ") + 
+#   ggtitle("WLZ over season in South Asian cohorts") + 
+#   theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12),
+#         plot.margin = unit(c(1,6,1,1), "lines")) 
+# print(p_asia)
+# 
+
+
+
+
+smooth_dat <- setDT(ggplot_build(p_asia)$data[[1]])
 smooth_lab <- smooth_dat[smooth_dat[, .I[x == max(x)], by=group]$V1]
-smooth_lab$label <- levels(factor(plotdf$studyid))
+smooth_lab$label <- levels(factor(plotdf2$studyid))
 #smooth_lab$y[6] <- 
 
-p2 <- p + annotate("text", x = smooth_lab$x, y=smooth_lab$y, 
+p_asia <- p_asia + annotate("text", x = smooth_lab$x, y=smooth_lab$y, 
                             label=smooth_lab$label, colour=smooth_lab$colour,
                             hjust=-0.05)
 
 # Code to turn off clipping
-gt1 <- ggplotGrob(p2)
+gt1 <- ggplotGrob(p_asia)
 gt1$layout$clip[gt1$layout$name == "panel"] <- "off"
-grid.draw(gt1)
+#grid.draw(gt1)
 
 
-ggsave(gt1, file="U:/Figures/season_WLZ_trajectories_allregions.png", width = 6, height = 5.2)
-ggsave(p, file="U:/Figures/season_WLZ_trajectories_allregions_no_label.png", width = 6, height = 5.2)
+ggsave(gt1, file="U:/Figures/Stunting Webinar/season_WLZ_trajectories2.png", width = 6, height = 5.2)
 
+
+
+
+
+
+
+# df$countrycohort<-paste0(df$studyid,df$country)
+# 
+# plotdf <- df
+# plotdf$highlight <- 1
+# 
+# plotdf <- plotdf %>% rename(Month=month)
+# plotdf$studyid[plotdf$studyid=="GMS-Nepal, Nepal"] <- "GMS-Nepal"
+# plotdf$studyid[plotdf$studyid=="CMC-V-BCS-2002, India"] <- "CMC, India"
+# plotdf$studyid <- gsub("Bangladesh","BD",plotdf$studyid)
+# 
+# 
+# p<-ggplot(plotdf, aes(x=Month, y=whz, group=factor(studyid), color=factor(studyid))) + 
+#   geom_smooth(method = 'loess',se = FALSE) +
+#   facet_wrap(~region) +
+#   coord_cartesian(ylim=c(0,-1.35), xlim=c(1,12)) +
+#   scale_x_continuous(breaks=c(1:12), labels= monthlabs, expand=c(0,0)) +
+#   scale_y_continuous(expand=c(0,0)) +
+#   scale_color_manual(values=rep(tableau10[c(1,3,4,2,5:10)],20),name = "Cohort") +
+#   scale_size(range=c(1, 2), guide=FALSE) +
+#   xlab("Month of measurement") + ylab("WLZ") + 
+#   ggtitle("Example: WLZ over season in South Asian cohorts") + 
+#   theme(legend.position="none", axis.text.y = element_text(size=12), axis.text.x = element_text(size=12),
+#         plot.margin = unit(c(1,6,1,1), "lines")) 
+# 
+# 
+# library(data.table)
+# smooth_dat <- setDT(ggplot_build(p)$data[[1]])
+# smooth_lab <- smooth_dat[smooth_dat[, .I[x == max(x)], by=group]$V1]
+# smooth_lab$label <- levels(factor(plotdf$studyid))
+# #smooth_lab$y[6] <- 
+# 
+# p2 <- p + annotate("text", x = smooth_lab$x, y=smooth_lab$y, 
+#                             label=smooth_lab$label, colour=smooth_lab$colour,
+#                             hjust=-0.05)
+# 
+# # Code to turn off clipping
+# gt1 <- ggplotGrob(p2)
+# gt1$layout$clip[gt1$layout$name == "panel"] <- "off"
+# grid.draw(gt1)
+# 
+# 
+# ggsave(gt1, file="U:/Figures/season_WLZ_trajectories_allregions.png", width = 6, height = 5.2)
+# ggsave(p, file="U:/Figures/season_WLZ_trajectories_allregions_no_label.png", width = 6, height = 5.2)
+# 
 
 
 

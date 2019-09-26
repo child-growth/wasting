@@ -130,7 +130,7 @@ p <- ggplot(d, aes(x=measid, y=whz, group=subjid, color=velcat) ) +
   geom_line(alpha=0.3) +
   geom_point(aes(y=whz2, color=inccat),alpha=0.3) +
   scale_fill_manual(values=c(corange,cteal))
-  geom_hline(aes(yintercept=-2),linetype="dashed") +
+geom_hline(aes(yintercept=-2),linetype="dashed") +
   scale_color_manual(values=cols,
                      guide=guide_legend(title="WHZ change:", 
                                         override.aes = list(alpha=1),
