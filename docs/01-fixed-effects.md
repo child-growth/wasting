@@ -21,7 +21,7 @@ The primary analyses presented in this manuscript pooled across individual studi
 <img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-prev-overall_region--allage-primary.png" width="4200" />
 
 ### Fixed effects
-
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-prev-overall_region--allage-primary_FE.png" width="4200" />
 
 
 
@@ -64,11 +64,11 @@ The primary analyses presented in this manuscript pooled across individual studi
 ## Age-specific longitudinal prevalence of persistent wasting
 
 ### Random effects
-
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/pooled_pers024.png" width="2400" />
 
 ### Fixed effects
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-perswast_plot_FE.png" width="1800" />
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/pooled_pers024_FE.png" width="2400" />
 
 ## Age-specific prevalence of concurrent wasting and stunting
 

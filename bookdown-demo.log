@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020/W32TeX) (preloaded format=xelatex 2020.6.7)  10 JUN 2020 21:12
+This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020/W32TeX) (preloaded format=xelatex 2020.6.7)  11 JUN 2020 12:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -897,17 +897,24 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [7]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
+es/wasting/FE/fig-wast-2-prev-overall_region--allage-primary_FE.png Graphic fil
+e (type bmp)
+<C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
+sting/FE/fig-wast-2-prev-overall_region--allage-primary_FE.png>
+
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 118--119
+[]  
+ []
+
+File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
 es/wasting/fig-wast-2-cuminc-overall_region--allage-primary.png Graphic file (t
 ype bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-wast-2-cuminc-overall_region--allage-primary.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 124--125
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 126--127
 []  
  []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [8]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
@@ -916,42 +923,49 @@ ile (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/FE/fig-wast-2-cuminc-overall_region--allage-primary_FE.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 129--130
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 131--132
 []  
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[9]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
 es/wasting/fig-wast-2-ir-overall_region--allage-primary.png Graphic file (type 
 bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-wast-2-ir-overall_region--allage-primary.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 137--138
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 139--140
 []  
  []
 
+[9]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
 es/wasting/FE/fig-wast-2-ir-overall_region--allage-primary_FE.png Graphic file 
 (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/FE/fig-wast-2-ir-overall_region--allage-primary_FE.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 142--143
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 144--145
 []  
  []
 
-[10]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
 es/wasting/fig-wast-2-rec-overall_region--allage-primary.png Graphic file (type
  bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-wast-2-rec-overall_region--allage-primary.png>
 
-Overfull \hbox (666.85675pt too wide) in paragraph at lines 150--151
+Overfull \hbox (666.85675pt too wide) in paragraph at lines 152--153
+[]  
+ []
+
+[10]
+File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
+es/wasting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png Graphic file
+ (type bmp)
+<C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
+sting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png>
+
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 157--158
 []  
  []
 
@@ -960,26 +974,12 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [11]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
-es/wasting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png Graphic file
- (type bmp)
-<C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
-sting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png>
-
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 155--156
-[]  
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[12]
-File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
 es/wasting/fig-wast-3-prev-overall_region--allage-primary.png Graphic file (typ
 e bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-wast-3-prev-overall_region--allage-primary.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 163--164
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 165--166
 []  
  []
 
@@ -989,17 +989,30 @@ e (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/FE/fig-wast-3-prev-overall_region--allage-primary_FE.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 168--169
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 170--171
 []  
  []
 
+[12]
+File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
+es/wasting/pooled_pers024.png Graphic file (type bmp)
+<C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
+sting/pooled_pers024.png>
+
+Overfull \hbox (233.16853pt too wide) in paragraph at lines 178--179
+[]  
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 [13]
 File: C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figur
-es/wasting/FE/fig-perswast_plot_FE.png Graphic file (type bmp)
+es/wasting/pooled_pers024_FE.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
-sting/FE/fig-perswast_plot_FE.png>
+sting/pooled_pers024_FE.png>
 
-Overfull \hbox (88.62642pt too wide) in paragraph at lines 179--180
+Overfull \hbox (233.16853pt too wide) in paragraph at lines 183--184
 []  
  []
 
@@ -1013,7 +1026,7 @@ bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-wast-2-co-overall_region--allage-primary.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 187--188
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 191--192
 []  
  []
 
@@ -1033,7 +1046,7 @@ es/wasting/FE/fig-wast-2-co-overall_region--allage-primary_FE.png Graphic file
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/FE/fig-wast-2-co-overall_region--allage-primary_FE.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 192--193
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 196--197
 []  
  []
 
@@ -1052,17 +1065,17 @@ es/wasting/fig-prev_plot_sasia.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-prev_plot_sasia.png>
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 204--207
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 208--211
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 204--207
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 208--211
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 204--207
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 208--211
 []  
  []
 
@@ -1091,17 +1104,17 @@ es/wasting/fig-sevwast_plot_sasia.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-sevwast_plot_sasia.png>
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 211--214
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 215--218
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 211--214
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 215--218
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 211--214
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 215--218
 []  
  []
 
@@ -1128,17 +1141,17 @@ es/wasting/fig-perswast_plot_sasia.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-perswast_plot_sasia.png>
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 218--221
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 222--225
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 218--221
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 222--225
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 218--221
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 222--225
 []  
  []
 
@@ -1171,17 +1184,17 @@ es/wasting/fig-co_plot_sasia.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-co_plot_sasia.png>
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 225--228
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 229--232
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 225--228
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 229--232
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 225--228
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 229--232
 []  
  []
 
@@ -1214,17 +1227,17 @@ es/wasting/fig-underweight_plot_sasia.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-underweight_plot_sasia.png>
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 232--235
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 236--239
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 232--235
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 236--239
 [] 
  []
 
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 232--235
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 236--239
 []  
  []
 
@@ -1256,7 +1269,7 @@ es/wasting/no-kenaba-bw/WLZ_by_region-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/WLZ_by_region-no-Kenaba-BW.png>
 
-Overfull \hbox (377.73274pt too wide) in paragraph at lines 247--248
+Overfull \hbox (377.73274pt too wide) in paragraph at lines 251--252
 []  
  []
 
@@ -1271,7 +1284,7 @@ es/wasting/no-kenaba-bw/fig-wast-prev-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-wast-prev-no-Kenaba-BW.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 252--253
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 256--257
 []  
  []
 
@@ -1290,7 +1303,7 @@ es/wasting/no-kenaba-bw/fig-wast-ci-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-wast-ci-no-Kenaba-BW.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 257--258
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 261--262
 []  
  []
 
@@ -1299,7 +1312,7 @@ es/wasting/no-kenaba-bw/fig-wast-ir-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-wast-ir-no-Kenaba-BW.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 262--263
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 266--267
 []  
  []
 
@@ -1312,7 +1325,7 @@ es/wasting/no-kenaba-bw/fig-wast-rec-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-wast-rec-no-Kenaba-BW.png>
 
-Overfull \hbox (666.85675pt too wide) in paragraph at lines 267--268
+Overfull \hbox (666.85675pt too wide) in paragraph at lines 271--272
 []  
  []
 
@@ -1331,7 +1344,7 @@ es/wasting/no-kenaba-bw/fig-sev-wast-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-sev-wast-no-Kenaba-BW.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 272--273
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 276--277
 []  
  []
 
@@ -1344,7 +1357,7 @@ es/wasting/no-kenaba-bw/fig-pers-wast-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-pers-wast-no-Kenaba-BW.png>
 
-Overfull \hbox (377.71068pt too wide) in paragraph at lines 277--278
+Overfull \hbox (377.71068pt too wide) in paragraph at lines 281--282
 []  
  []
 
@@ -1363,7 +1376,7 @@ es/wasting/no-kenaba-bw/fig-co-prev-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-co-prev-no-Kenaba-BW.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 282--283
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 286--287
 []  
  []
 
@@ -1382,7 +1395,7 @@ es/wasting/no-kenaba-bw/fig-uw-prev-no-Kenaba-BW.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/no-kenaba-bw/fig-uw-prev-no-Kenaba-BW.png>
 
-Overfull \hbox (666.82588pt too wide) in paragraph at lines 287--288
+Overfull \hbox (666.82588pt too wide) in paragraph at lines 291--292
 []  
  []
 
@@ -1417,7 +1430,7 @@ e bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wa
 sting/fig-wast-2-muac-overall_region--allage-primary.png>
 
-Overfull \hbox (666.795pt too wide) in paragraph at lines 294--295
+Overfull \hbox (666.795pt too wide) in paragraph at lines 298--299
 []  
  []
 
@@ -1460,32 +1473,32 @@ es/shared/wlz_QA_cohort_monthly.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/sh
 ared/wlz_QA_cohort_monthly.png>
 
-Overfull \hbox (233.18617pt too wide) in paragraph at lines 306--312
+Overfull \hbox (233.18617pt too wide) in paragraph at lines 310--316
 [][] 
  []
 
 
-Overfull \hbox (342.51088pt too wide) in paragraph at lines 306--312
+Overfull \hbox (342.51088pt too wide) in paragraph at lines 310--316
 [] 
  []
 
 
-Overfull \hbox (233.18617pt too wide) in paragraph at lines 306--312
+Overfull \hbox (233.18617pt too wide) in paragraph at lines 310--316
 [] 
  []
 
 
-Overfull \hbox (342.51088pt too wide) in paragraph at lines 306--312
+Overfull \hbox (342.51088pt too wide) in paragraph at lines 310--316
 [] 
  []
 
 
-Overfull \hbox (342.51088pt too wide) in paragraph at lines 306--312
+Overfull \hbox (342.51088pt too wide) in paragraph at lines 310--316
 [] 
  []
 
 
-Overfull \hbox (342.51088pt too wide) in paragraph at lines 306--312
+Overfull \hbox (342.51088pt too wide) in paragraph at lines 310--316
 []  
  []
 
@@ -1532,17 +1545,17 @@ es/shared/wlz_secular_trend_monthly.png Graphic file (type bmp)
 <C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/sh
 ared/wlz_secular_trend_monthly.png>
 
-Overfull \hbox (233.18617pt too wide) in paragraph at lines 318--321
+Overfull \hbox (233.18617pt too wide) in paragraph at lines 322--325
 [][] 
  []
 
 
-Overfull \hbox (233.18617pt too wide) in paragraph at lines 318--321
+Overfull \hbox (233.18617pt too wide) in paragraph at lines 322--325
 [] 
  []
 
 
-Overfull \hbox (233.18617pt too wide) in paragraph at lines 318--321
+Overfull \hbox (233.18617pt too wide) in paragraph at lines 322--325
 []  
  []
 
@@ -1551,24 +1564,24 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [52]
 No file bookdown-demo.bbl.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 324.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 328.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [53] [54]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 324.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 328.
 (./bookdown-demo.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 324.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 324.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 328.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 328.
 Package rerunfilecheck Info: File `bookdown-demo.out' has not changed.
 (rerunfilecheck)             Checksum: 84ADB9C699803C8BD99B87C62134656E;7728.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 324.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 328.
  ) 
 Here is how much of TeX's memory you used:
- 17609 strings out of 481276
- 361218 string characters out of 5923431
+ 17631 strings out of 481276
+ 363658 string characters out of 5923431
  722338 words of memory out of 5000000
- 34839 multiletter control sequences out of 15000+600000
+ 34859 multiletter control sequences out of 15000+600000
  543745 words of font info for 93 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  53i,8n,118p,907b,370s stack positions out of 5000i,500n,10000p,200000b,80000s
