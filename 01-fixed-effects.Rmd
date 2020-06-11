@@ -28,7 +28,7 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 
 ### Fixed effects
 ```{r prev-primary_FE, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-prev-overall_region--allage-primary_FE.png"))
+# include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/FE/fig-wast-2-prev-overall_region--allage-primary_FE.png"))
 ```
 
 
@@ -44,7 +44,7 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 ### Fixed effects
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-cuminc-overall_region--allage-primary_FE.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-cuminc-overall_region--allage-primary_FE.png"))
 
 ```
 
@@ -59,7 +59,7 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 ### Fixed effects
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-ir-overall_region--allage-primary_FE.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-ir-overall_region--allage-primary_FE.png"))
 
 ```
 
@@ -74,7 +74,7 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 ### Fixed effects
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-rec-overall_region--allage-primary_FE.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png"))
 
 ```
 
@@ -89,7 +89,7 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 ### Fixed effects
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-3-prev-overall_region--allage-primary_FE.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-3-prev-overall_region--allage-primary_FE.png"))
 
 ```
 
@@ -97,14 +97,14 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 
 ### Random effects
 ```{r, echo = FALSE}
-#include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot.png"))
+# include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot.png"))
 
 ```
 
 ### Fixed effects
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_FE.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/fig-perswast_plot_FE.png"))
 
 ```
 
@@ -119,7 +119,7 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 ### Fixed effects
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-co-overall_region--allage-primary_FE.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-co-overall_region--allage-primary_FE.png"))
 
 ```
 

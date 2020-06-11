@@ -18,48 +18,57 @@ The primary analyses presented in this manuscript pooled across individual studi
 ## Age-specific prevalence
 
 ### Random effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-prev-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-prev-overall_region--allage-primary} 
 
 ### Fixed effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-prev-overall_region--allage-primary_FE.png" width="4200" />
+
 
 
 
 ## Age-specific incidence
 
 ### Random effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-cuminc-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-cuminc-overall_region--allage-primary} 
 
 ### Fixed effects
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-cuminc-overall_region--allage-primary_FE.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-cuminc-overall_region--allage-primary_FE} 
 
 ## Age-specific incidence rate
 
 ### Random effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-ir-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-ir-overall_region--allage-primary} 
 
 ### Fixed effects
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-ir-overall_region--allage-primary_FE.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-ir-overall_region--allage-primary_FE} 
 
 ## Age-specific recovery
 
 ### Random effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-rec-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-rec-overall_region--allage-primary} 
 
 ### Fixed effects
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-rec-overall_region--allage-primary_FE.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-rec-overall_region--allage-primary_FE} 
 
 ## Age-specific prevalence of severe wasting
 
 ### Random effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-3-prev-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-3-prev-overall_region--allage-primary} 
 
 ### Fixed effects
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-3-prev-overall_region--allage-primary_FE.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-3-prev-overall_region--allage-primary_FE} 
 
 ## Age-specific longitudinal prevalence of persistent wasting
 
@@ -68,16 +77,19 @@ The primary analyses presented in this manuscript pooled across individual studi
 
 ### Fixed effects
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_FE.png" width="1800" />
+
+\includegraphics[width=25in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-perswast_plot_FE} 
 
 ## Age-specific prevalence of concurrent wasting and stunting
 
 ### Random effects
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-co-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-co-overall_region--allage-primary} 
 
 ### Fixed effects
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-co-overall_region--allage-primary_FE.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/FE/fig-wast-2-co-overall_region--allage-primary_FE} 
 
 <!-- ## Age-specific prevalence of underweight (weight-for-age Z-score < -2) -->
 

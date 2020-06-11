@@ -13,5 +13,6 @@ fontsize: 9pt
 
 
 
-<img src="/Users/Nolan/Documents/Berkeley/Colford-Hubbard/ki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-muac-overall_region--allage-primary.png" width="4200" />
+
+\includegraphics[width=58.33in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-muac-overall_region--allage-primary} 
 
