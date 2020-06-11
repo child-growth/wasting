@@ -18,10 +18,7 @@ Below are the cohort-specific estimates for the age-specific prevalences of wast
 
 ## Age-specific prevalence
 
-
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-prev_plot_africa} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-prev_plot_lam} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-prev_plot_sasia} 
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-prev_plot_africa.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-prev_plot_lam.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-prev_plot_sasia.png" width="3000" />
 
 
 
@@ -48,30 +45,18 @@ Below are the cohort-specific estimates for the age-specific prevalences of wast
 
 ## Age-specific prevalence of severe wasting
 
-
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-sevwast_plot_africa} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-sevwast_plot_lam} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-sevwast_plot_sasia} 
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-sevwast_plot_africa.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-sevwast_plot_lam.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-sevwast_plot_sasia.png" width="3000" />
 
 ## Age-specific longitudinal prevalence of persistent wasting
 
-
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_africa} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_lam} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_sasia} 
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_africa.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_lam.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-perswast_plot_sasia.png" width="3000" />
 
 ## Age-specific prevalence of concurrent wasting and stunting
 
-
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-co_plot_africa} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-co_plot_lam} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-co_plot_sasia} 
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-co_plot_africa.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-co_plot_lam.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-co_plot_sasia.png" width="3000" />
 
 ## Age-specific prevalence of underweight (weight-for-age Z-score < -2)
 
-
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-underweight_plot_africa} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-underweight_plot_lam} 
-\includegraphics[width=41.67in]{C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-underweight_plot_sasia} 
+<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-underweight_plot_africa.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-underweight_plot_lam.png" width="3000" /><img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-underweight_plot_sasia.png" width="3000" />
 
 

@@ -22,15 +22,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Mean WLZ by region
 
 ```{r, echo = FALSE}
-# include_graphics(paste0(fig_dir, "wasting/fig-wast-2-prev-overall_region--allage-primary-no-Kenaba-BW.png"))
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/WLZ_by_region-no-Kenaba-BW.png"))
+# include_graphics(paste0(fig_dir, "wasting/no-kenaba-bw/fig-wast-2-prev-overall_region--allage-primary-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/WLZ_by_region-no-Kenaba-BW.png"))
 ```
 
 ## Age-specific prevalence
 
 ```{r prev-primary-no-Kenaba-BW, echo = FALSE}
-# include_graphics(paste0(fig_dir, "wasting/fig-wast-2-prev-overall_region--allage-primary-no-Kenaba-BW.png"))
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-prev-no-Kenaba-BW.png"))
+# include_graphics(paste0(fig_dir, "wasting/no-kenaba-bw/fig-wast-2-prev-overall_region--allage-primary-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-prev-no-Kenaba-BW.png"))
 ```
 
 
@@ -38,49 +38,49 @@ include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wast
 ## Age-specific incidence
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-ci-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-ci-no-Kenaba-BW.png"))
 
 ```
 
 ## Age-specific incidence rate
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-ir-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-ir-no-Kenaba-BW.png"))
 
 ```
 
 ## Age-specific recovery
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-wast-rec-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-rec-no-Kenaba-BW.png"))
 
 ```
 
 ## Age-specific prevalence of severe wasting
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-sev-wast-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-sev-wast-no-Kenaba-BW.png"))
 
 ```
 
 ## Age-specific longitudinal prevalence of persistent wasting
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-pers-wast-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-pers-wast-no-Kenaba-BW.png"))
 
 ```
 
 ## Age-specific prevalence of concurrent wasting and stunting
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-co-prev-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-co-prev-no-Kenaba-BW.png"))
 
 ```
 
 ## Age-specific prevalence of underweight (weight-for-age Z-score < -2)
 
 ```{r, echo = FALSE}
-include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/fig-uw-prev-no-Kenaba-BW.png"))
+include_graphics(paste0(here::here(), "/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-uw-prev-no-Kenaba-BW.png"))
 
 ```
 
