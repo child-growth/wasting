@@ -17,6 +17,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r muac, echo = FALSE}
-include_graphics(paste0(BV_dir,"/wasting/fig-wast-2-muac-overall_region--allage-primary.png"))
+include_graphics(paste0(fig_dir,"/wasting/fig-wast-2-muac-overall_region--allage-primary.png"))
 ```
 
