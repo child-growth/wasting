@@ -10,8 +10,10 @@ fontsize: 9pt
 
 \raggedright
 
+MUAC was only measured in a subset of cohorts. (FILL IN)
 
 
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/fig-wast-2-muac-overall_region--allage-primary.png" width="4200" />
+
+<img src="/data/KI/ki-manuscript-output/figures//wasting/fig-wast-2-muac-overall_region--allage-primary.png" width="2100" />
 

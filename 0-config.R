@@ -34,7 +34,7 @@ library(stringr)
 library(mgcv)
 library(grid)
 library(lazyeval)
-library(rlang)
+#library(rlang)
 library(scales)
 library(xtable)
 

@@ -17,6 +17,8 @@ we see that the at birth measurements LAZ is ~0, and then for the follow-up meas
 ```{r setup3, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
+source(paste0(here::here(), "/0-config.R"))
+
 ```
 
 ## Mean WLZ by region

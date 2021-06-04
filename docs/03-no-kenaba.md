@@ -18,40 +18,40 @@ we see that the at birth measurements LAZ is ~0, and then for the follow-up meas
 
 ## Mean WLZ by region
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/WLZ_by_region-no-Kenaba-BW.png" width="3000" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/WLZ_by_region-no-Kenaba-BW.png" width="1500" />
 
 ## Age-specific prevalence
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-prev-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-wast-prev-no-Kenaba-BW.png" width="2100" />
 
 
 
 ## Age-specific incidence
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-ci-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-wast-ci-no-Kenaba-BW.png" width="2100" />
 
 ## Age-specific incidence rate
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-ir-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-wast-ir-no-Kenaba-BW.png" width="2100" />
 
 ## Age-specific recovery
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-wast-rec-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-wast-rec-no-Kenaba-BW.png" width="2100" />
 
 ## Age-specific prevalence of severe wasting
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-sev-wast-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-sev-wast-no-Kenaba-BW.png" width="2100" />
 
 ## Age-specific longitudinal prevalence of persistent wasting
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-pers-wast-no-Kenaba-BW.png" width="3000" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-pers-wast-no-Kenaba-BW.png" width="1500" />
 
 ## Age-specific prevalence of concurrent wasting and stunting
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-co-prev-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-co-prev-no-Kenaba-BW.png" width="2100" />
 
 ## Age-specific prevalence of underweight (weight-for-age Z-score < -2)
 
-<img src="C:/Users/andre/Documents/HBGDki/wasting/ki-longitudinal-manuscripts/figures/wasting/no-kenaba-bw/fig-uw-prev-no-Kenaba-BW.png" width="4200" />
+<img src="/data/KI/ki-manuscript-output/figures//wasting/no-kenaba-bw/fig-uw-prev-no-Kenaba-BW.png" width="2100" />
 
 

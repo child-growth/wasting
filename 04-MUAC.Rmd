@@ -10,10 +10,14 @@ fontsize: 9pt
 
 \raggedright
 
+MUAC was only measured in a subset of cohorts. (FILL IN)
+
 
 ```{r setup4, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
+source(paste0(here::here(), "/0-config.R"))
+
 ```
 
 ```{r muac, echo = FALSE}
