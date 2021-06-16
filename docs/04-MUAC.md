@@ -15,5 +15,5 @@ MUAC was only measured in a subset of cohorts. (FILL IN)
 
 
 
-<img src="/data/KI/ki-manuscript-output/figures//wasting/fig-wast-2-muac-overall_region--allage-primary.png" width="2100" />
+<img src="figures//wasting/fig-wast-2-muac-overall_region--allage-primary.png" width="2100" />
 
