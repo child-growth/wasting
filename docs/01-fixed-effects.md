@@ -18,66 +18,66 @@ The primary analyses presented in this manuscript pooled across individual studi
 ## Age-specific prevalence
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/fig-wast-2-prev-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-2-prev-overall_region--allage-primary.png" width="2100" />
 
 ### Fixed effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/FE/fig-wast-2-prev-overall_region--allage-primary_FE.png" width="2100" />
+<img src="figures/wasting/FE/fig-wast-2-prev-overall_region--allage-primary_FE.png" width="2100" />
 
 
 
 ## Age-specific incidence
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/fig-wast-2-cuminc-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-2-cuminc-overall_region--allage-primary.png" width="2100" />
 
 ### Fixed effects
 
-<img src="/data/KI/ki-manuscript-output/figures/wasting/FE/fig-wast-2-cuminc-overall_region--allage-primary_FE.png" width="2100" />
+<img src="figures/wasting/FE/fig-wast-2-cuminc-overall_region--allage-primary_FE.png" width="2100" />
 
 ## Age-specific incidence rate
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/fig-wast-2-ir-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-2-ir-overall_region--allage-primary.png" width="2100" />
 
 ### Fixed effects
 
-<img src="/data/KI/ki-manuscript-output/figures/wasting/FE/fig-wast-2-ir-overall_region--allage-primary_FE.png" width="2100" />
+<img src="figures/wasting/FE/fig-wast-2-ir-overall_region--allage-primary_FE.png" width="2100" />
 
 ## Age-specific recovery
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/fig-wast-2-rec-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-2-rec-overall_region--allage-primary.png" width="2100" />
 
 ### Fixed effects
 
-<img src="/data/KI/ki-manuscript-output/figures/wasting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png" width="2100" />
+<img src="figures/wasting/FE/fig-wast-2-rec-overall_region--allage-primary_FE.png" width="2100" />
 
 ## Age-specific prevalence of severe wasting
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/fig-wast-3-prev-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-3-prev-overall_region--allage-primary.png" width="2100" />
 
 ### Fixed effects
 
-<img src="/data/KI/ki-manuscript-output/figures/wasting/FE/fig-wast-3-prev-overall_region--allage-primary_FE.png" width="2100" />
+<img src="figures/wasting/FE/fig-wast-3-prev-overall_region--allage-primary_FE.png" width="2100" />
 
 ## Age-specific longitudinal prevalence of persistent wasting
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/pooled_pers024.png" width="1200" />
+<img src="figures/wasting/pooled_pers024.png" width="1200" />
 
 ### Fixed effects
 
-<img src="/data/KI/ki-manuscript-output/figures/wasting/pooled_pers024_FE.png" width="1200" />
+<img src="figures/wasting/pooled_pers024_FE.png" width="1200" />
 
 ## Age-specific prevalence of concurrent wasting and stunting
 
 ### Random effects
-<img src="/data/KI/ki-manuscript-output/figures/wasting/fig-wast-2-co-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-2-co-overall_region--allage-primary.png" width="2100" />
 
 ### Fixed effects
 
-<img src="/data/KI/ki-manuscript-output/figures/wasting/FE/fig-wast-2-co-overall_region--allage-primary_FE.png" width="2100" />
+<img src="figures/wasting/FE/fig-wast-2-co-overall_region--allage-primary_FE.png" width="2100" />
 
 <!-- ## Age-specific prevalence of underweight (weight-for-age Z-score < -2) -->
 
