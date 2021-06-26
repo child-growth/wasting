@@ -13,9 +13,9 @@ fontsize: 9pt
 
 
 ```{r setup5, include=FALSE}
+source(paste0(here::here(), "/0-config.R"))
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
-source(paste0(here::here(), "/0-config.R"))
 
 ```
 

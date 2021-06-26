@@ -15,8 +15,8 @@ Below are the cohort-specific estimates for the age-specific prevalences of wast
 
 
 ```{r setup2, include=FALSE}
-library(knitr)
 source(paste0(here::here(), "/0-config.R"))
+library(knitr)
 
 ```
 
