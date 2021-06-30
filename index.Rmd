@@ -27,7 +27,5 @@ knitr::write_bib(c(
   .packages(), 'bookdown', 'knitr', 'rmarkdown'
 ), 'packages.bib')
 
-file.copy(from="/data/KI/ki-manuscript-output/figures/", 
-          to=figdata_dir_wasting, overwrite=TRUE, recursive=TRUE)
 
 ```
