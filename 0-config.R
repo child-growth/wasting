@@ -95,9 +95,6 @@ fig_dir                           = "figures/"
 figdata_dir_stunting              = paste0(fig_dir,"stunting/figure-data/")
 figdata_dir_wasting               = paste0(fig_dir,"wasting/figure-data/")
 
-file.copy(from="/data/KI/ki-manuscript-output/figures/", 
-          to=fig_dir, overwrite=TRUE, recursive=TRUE)
-
 #################################
 # Data Cleaning Scripts
 included_studies_path             = paste0(ghapdata_dir, "FINAL_only_included_studies.rds")

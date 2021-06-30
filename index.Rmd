@@ -27,5 +27,7 @@ knitr::write_bib(c(
   .packages(), 'bookdown', 'knitr', 'rmarkdown'
 ), 'packages.bib')
 
+file.copy(from="/data/KI/ki-manuscript-output/figures/", 
+          to=paste0(here::here(), "/"), overwrite=TRUE, recursive=TRUE)
 
 ```
