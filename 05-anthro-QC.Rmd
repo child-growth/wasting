@@ -11,6 +11,12 @@ fontsize: 9pt
 \raggedright
 
 
+## Overview
+
+__Purpose: __
+__Interpretation: __
+__Implications: __
+
 
 ```{r setup5, include=FALSE}
 source(paste0(here::here(), "/0-config.R"))
