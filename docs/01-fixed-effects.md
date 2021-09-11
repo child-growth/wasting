@@ -73,7 +73,7 @@ The primary analyses presented in this manuscript pooled across individual studi
 ## Age-specific prevalence of concurrent wasting and stunting
 
 ### Random effects
-<img src="figures/wasting/fig-wast-2-co-overall_region--allage-primary.png" width="2100" />
+<img src="figures/wasting/fig-wast-2-co-overall_region--allage-primary.png" width="2250" />
 
 ### Fixed effects
 

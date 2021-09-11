@@ -41,3 +41,5 @@ muac
 anthro
 anthropometry-measuresments-compared-to-who-standards
 age-specific-incidence-2
+ir
+figure
