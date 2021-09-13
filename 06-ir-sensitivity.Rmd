@@ -1,0 +1,24 @@
+# IR-Sensitivity {#ir}
+
+---
+output:
+  pdf_document:
+    keep_tex: yes
+fontfamily: mathpazo
+fontsize: 9pt
+---
+
+\raggedright
+
+```{r setup6, include=FALSE}
+source(paste0(here::here(), "/0-config.R"))
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Figure
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"/wasting/fig-wast-2-ir-overall_region--allage-ir_sense.png"))
+```
+
