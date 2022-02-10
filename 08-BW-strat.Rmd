@@ -1,0 +1,144 @@
+# Child wasting and underweight stratified by low birthweight and preterm birth status {#BWstrat}
+
+---
+output:
+  pdf_document:
+    keep_tex: yes
+fontfamily: mathpazo
+fontsize: 9pt
+---
+
+\raggedright
+
+
+
+
+```{r setup1, include=FALSE}
+source(paste0(here::here(), "/0-config.R"))
+library(knitr)
+library(DT)
+knitr::opts_chunk$set(echo = TRUE)
+
+
+load(paste0(fig_dir,"underweight/figure-data/BW_strat_figs.Rdata"))
+load(paste0(fig_dir,"underweight/figure-data/BW_strat_tabs.Rdata"))
+
+```
+
+## Weight-for-age Z-score (WAZ)
+
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+plot_birthwt
+```
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+plot_gagebrth
+```
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+plot_birthwt.gagebrth
+```
+
+## Weight-for-length Z-score (WLZ)
+
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+plot_birthwt_wlz
+```
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+plot_gagebrth_wlz
+```
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+plot_birthwt.gagebrth_wlz
+```
+
+## Age-specific prevalence of wasting, stratified by birthweight
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_wast$plot
+```
+
+## Age-specific prevalence of wasting, stratified by gestational age
+
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_gagebrth_wast$plot
+```
+
+
+## Age-specific prevalence of wasting, stratified by birthweight and gestational age
+
+#### Overall
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_gagebrth_overall_wast$plot
+```
+
+#### African cohorts
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_gagebrth_africa_wast$plot
+```
+
+#### South Asian cohorts
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_gagebrth_asia_wast$plot
+```
+
+
+
+## Age-specific prevalence of underweight, stratified by birthweight
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight$plot
+```
+
+## Age-specific prevalence of underweight, stratified by gestational age
+
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_gagebrth$plot
+```
+
+
+## Age-specific prevalence of underweight, stratified by birthweight and gestational age
+
+#### Overall
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_gagebrth_overall$plot
+```
+
+#### African cohorts
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_gagebrth_africa$plot
+```
+
+#### South Asian cohorts
+
+```{r, echo=F, warning=F, message=F, fig.width = 10, fig.height = 6.5}
+prev_plot_birthweight_gagebrth_asia$plot
+```
+
+
+## Tables
+
+```{r, echo=F, warning=F, message=F}
+DT::datatable(tab_birthweight)
+```
+
+```{r, echo=F, warning=F, message=F}
+DT::datatable(tab_gagebrth)
+```
+
+```{r, echo=F, warning=F, message=F}
+DT::datatable(tab_birthwt_gagebrth)
+```
+
+
+

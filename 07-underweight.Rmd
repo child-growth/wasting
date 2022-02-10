@@ -1,0 +1,96 @@
+# Underweight descriptive statistics {#underweight}
+
+---
+output:
+  pdf_document:
+    keep_tex: yes
+fontfamily: mathpazo
+fontsize: 9pt
+---
+
+\raggedright
+
+
+
+
+```{r setup1, include=FALSE}
+source(paste0(here::here(), "/0-config.R"))
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+
+tab <- readRDS(paste0(fig_dir,"underweight/figure-data/all-figdata.RDS"))
+
+
+
+```
+
+## Weight-for-age Z-score (WAZ)
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-wlz-2-mean-overall_region--allage-primary.png"))
+
+```
+
+## Age-specific prevalence
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-underweight-2-prev-overall_region--allage-primary.png"))
+
+```
+
+
+
+## Age-specific incidence
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-underweight-2-inc-overall_region--allage-primary.png"))
+
+```
+
+
+## Age-specific incidence rate
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-underweight-2-ir-overall_region--allage-primary.png"))
+
+```
+
+
+
+## Age-specific recovery
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-underweight-2-rec-overall_region--allage-primary.png"))
+
+```
+
+
+## Age-specific prevalence of severe underweight
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-underweight-3-prev-overall_region--allage-primary.png"))
+
+```
+
+
+## Age-specific longitudinal prevalence of persistent underweight
+
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-persunderweight.png"))
+
+```
+
+
+
+## Table of all underweight results
+
+```{r, echo=F, warning=F, message=F}
+DT::datatable(tab)
+```
