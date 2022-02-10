@@ -15,94 +15,128 @@ fontsize: 9pt
 
 
 
-## Weight-for-age Z-score (WAZ)
+## Tables of birthweight and gestational age availability.
+
+Note that gestational age was only measured in four small cohorts with monthly measurements, two from sub-Saharan Africa and two from India. The Indian cohorts in particular include a little over 200 children each. Some estimates are grouped by region, but note the data is not sufficient in number of children or diversity of populations to make regional extrapolations, especially for the rare categories like born preterm with normal birthweight (>2500g). The gestational age data is also not based on ultrasound data, so is measured imprecisely based on last menstrual recall or the Dubowitz method (newborn exam).
 
 
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-1-1.png" width="960" />
+|Study                   |Normal or high birthweight |Low birthweight |
+|:-----------------------|:--------------------------|:---------------|
+|CMC-V-BCS-2002-INDIA    |322 (88.2%)                |43 (11.8%)      |
+|EE-PAKISTAN             |245 (64.6%)                |134 (35.4%)     |
+|GMS-Nepal-NEPAL         |96 (68.6%)                 |44 (31.4%)      |
+|IRC-INDIA               |335 (82.9%)                |69 (17.1%)      |
+|Keneba-GAMBIA           |1805 (85.2%)               |313 (14.8%)     |
+|MAL-ED-BANGLADESH       |203 (78.7%)                |55 (21.3%)      |
+|MAL-ED-BRAZIL           |221 (94.8%)                |12 (5.2%)       |
+|MAL-ED-INDIA            |205 (83.7%)                |40 (16.3%)      |
+|MAL-ED-NEPAL            |212 (91%)                  |21 (9%)         |
+|MAL-ED-PERU             |279 (93.3%)                |20 (6.7%)       |
+|MAL-ED-SOUTH AFRICA     |290 (92.4%)                |24 (7.6%)       |
+|MAL-ED-TANZANIA         |125 (94.7%)                |7 (5.3%)        |
+|PROVIDE-BANGLADESH      |532 (76%)                  |168 (24%)       |
+|TanzaniaChild2-TANZANIA |2293 (96.5%)               |82 (3.5%)       |
+|TDC-INDIA               |133 (88.1%)                |18 (11.9%)      |
 
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-2-1.png" width="960" />
 
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-3-1.png" width="960" />
+|Study                   |Full or late term |Early term  |Preterm     |
+|:-----------------------|:-----------------|:-----------|:-----------|
+|CMC-V-BCS-2002-INDIA    |215 (61.3%)       |84 (23.9%)  |52 (14.8%)  |
+|IRC-INDIA               |250 (64.1%)       |98 (25.1%)  |42 (10.8%)  |
+|Keneba-GAMBIA           |847 (49.4%)       |609 (35.6%) |257 (15%)   |
+|TanzaniaChild2-TANZANIA |1393 (61.7%)      |515 (22.8%) |350 (15.5%) |
 
-## Weight-for-length Z-score (WLZ)
 
+|Study                   |Normal or high birthweight-Full or late term |Normal or high birthweight-Early term |Normal or high birthweight-Preterm |Low birthweight-Full or late term |Low birthweight-Early term |Low birthweight-Preterm |
+|:-----------------------|:--------------------------------------------|:-------------------------------------|:----------------------------------|:---------------------------------|:--------------------------|:-----------------------|
+|CMC-V-BCS-2002-INDIA    |195 (56.7%)                                  |70 (20.3%)                            |39 (11.3%)                         |16 (4.7%)                         |12 (3.5%)                  |12 (3.5%)               |
+|IRC-INDIA               |217 (56.1%)                                  |76 (19.6%)                            |27 (7%)                            |33 (8.5%)                         |20 (5.2%)                  |14 (3.6%)               |
+|Keneba-GAMBIA           |756 (44.8%)                                  |516 (30.6%)                           |173 (10.2%)                        |80 (4.7%)                         |82 (4.9%)                  |82 (4.9%)               |
+|TanzaniaChild2-TANZANIA |1356 (60.6%)                                 |492 (22%)                             |315 (14.1%)                        |26 (1.2%)                         |16 (0.7%)                  |33 (1.5%)               |
+
+
+## Weight-for-age Z-scores (WAZ)
+
+### Age-specific WAZ stratified by birthweight
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-4-1.png" width="960" />
 
+### Age-specific WAZ stratified by gestational age
+
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-5-1.png" width="960" />
+
+### Age-specific WAZ stratified by birthweight and gestational age
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-6-1.png" width="960" />
 
-## Age-specific prevalence of wasting, stratified by birthweight
+## Weight-for-length Z-scores (WLZ)
+
+### Age-specific WLZ stratified by birthweight 
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-7-1.png" width="960" />
 
-## Age-specific prevalence of wasting, stratified by gestational age
-
+### Age-specific WLZ stratified by gestational age
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-8-1.png" width="960" />
 
-
-## Age-specific prevalence of wasting, stratified by birthweight and gestational age
-
-#### Overall
+### Age-specific WLZ stratified by birthweight and gestational age
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-9-1.png" width="960" />
 
-#### African cohorts
+## Prevalence of wasting
+
+### Age-specific prevalence of wasting, stratified by birthweight
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-10-1.png" width="960" />
 
-#### South Asian cohorts
+### Age-specific prevalence of wasting, stratified by gestational age
+
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-11-1.png" width="960" />
 
 
-
-## Age-specific prevalence of underweight, stratified by birthweight
-
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-12-1.png" width="960" />
-
-## Age-specific prevalence of underweight, stratified by gestational age
-
-
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-13-1.png" width="960" />
-
-
-## Age-specific prevalence of underweight, stratified by birthweight and gestational age
+### Age-specific prevalence of wasting, stratified by birthweight and gestational age
 
 #### Overall
 
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-14-1.png" width="960" />
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-12-1.png" width="960" />
 
 #### African cohorts
 
-<img src="08-BW-strat_files/figure-html/unnamed-chunk-15-1.png" width="960" />
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-13-1.png" width="960" />
 
 #### South Asian cohorts
+
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-14-1.png" width="960" />
+
+## Prevalence of underweight
+
+### Age-specific prevalence of underweight, stratified by birthweight
+
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-15-1.png" width="960" />
+
+### Age-specific prevalence of underweight, stratified by gestational age
+
 
 <img src="08-BW-strat_files/figure-html/unnamed-chunk-16-1.png" width="960" />
 
 
-## Tables
+### Age-specific prevalence of underweight, stratified by birthweight and gestational age
+
+#### Overall
+
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-17-1.png" width="960" />
+
+#### African cohorts
+
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-18-1.png" width="960" />
+
+#### South Asian cohorts
+
+<img src="08-BW-strat_files/figure-html/unnamed-chunk-19-1.png" width="960" />
 
 
-```{=html}
-<div id="htmlwidget-befb15b3ad57f7ac60f0" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-befb15b3ad57f7ac60f0">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],["CMC-V-BCS-2002-INDIA","EE-PAKISTAN","GMS-Nepal-NEPAL","IRC-INDIA","Keneba-GAMBIA","MAL-ED-BANGLADESH","MAL-ED-BRAZIL","MAL-ED-INDIA","MAL-ED-NEPAL","MAL-ED-PERU","MAL-ED-SOUTH AFRICA","MAL-ED-TANZANIA","PROVIDE-BANGLADESH","TanzaniaChild2-TANZANIA","TDC-INDIA"],["322 (88.2%)","245 (64.6%)","96 (68.6%)","335 (82.9%)","1805 (85.2%)","203 (78.7%)","221 (94.8%)","205 (83.7%)","212 (91%)","279 (93.3%)","290 (92.4%)","125 (94.7%)","532 (76%)","2293 (96.5%)","133 (88.1%)"],["43 (11.8%)","134 (35.4%)","44 (31.4%)","69 (17.1%)","313 (14.8%)","55 (21.3%)","12 (5.2%)","40 (16.3%)","21 (9%)","20 (6.7%)","24 (7.6%)","7 (5.3%)","168 (24%)","82 (3.5%)","18 (11.9%)"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Study<\/th>\n      <th>Normal or high birthweight<\/th>\n      <th>Low birthweight<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
-```
 
-
-```{=html}
-<div id="htmlwidget-642e46cdd370fe5cc878" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-642e46cdd370fe5cc878">{"x":{"filter":"none","data":[["1","2","3","4"],["CMC-V-BCS-2002-INDIA","IRC-INDIA","Keneba-GAMBIA","TanzaniaChild2-TANZANIA"],["195 (56.7%)","217 (56.1%)","756 (44.8%)","1356 (60.6%)"],["70 (20.3%)","76 (19.6%)","516 (30.6%)","492 (22%)"],["39 (11.3%)","27 (7%)","173 (10.2%)","315 (14.1%)"],["16 (4.7%)","33 (8.5%)","80 (4.7%)","26 (1.2%)"],["12 (3.5%)","20 (5.2%)","82 (4.9%)","16 (0.7%)"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Var1<\/th>\n      <th>prop.x<\/th>\n      <th>prop.y<\/th>\n      <th>prop.x.x<\/th>\n      <th>prop.y.y<\/th>\n      <th>prop<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
-```
-
-
-```{=html}
-<div id="htmlwidget-80ea41403a6838613174" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-80ea41403a6838613174">{"x":{"filter":"none","data":[["1","2","3","4"],["CMC-V-BCS-2002-INDIA","IRC-INDIA","Keneba-GAMBIA","TanzaniaChild2-TANZANIA"],["195 (56.7%)","217 (56.1%)","756 (44.8%)","1356 (60.6%)"],["70 (20.3%)","76 (19.6%)","516 (30.6%)","492 (22%)"],["39 (11.3%)","27 (7%)","173 (10.2%)","315 (14.1%)"],["16 (4.7%)","33 (8.5%)","80 (4.7%)","26 (1.2%)"],["12 (3.5%)","20 (5.2%)","82 (4.9%)","16 (0.7%)"],["12 (3.5%)","14 (3.6%)","82 (4.9%)","33 (1.5%)"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Study<\/th>\n      <th>Normal or high birthweight-Full or late term<\/th>\n      <th>Normal or high birthweight-Early term<\/th>\n      <th>Normal or high birthweight-Preterm<\/th>\n      <th>Low birthweight-Full or late term<\/th>\n      <th>Low birthweight-Early term<\/th>\n      <th>Low birthweight-Preterm<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
-```
 
 
 
