@@ -1,0 +1,346 @@
+# Tabulation of low birthweight and preterm birth status among children ever wasted or underweight in the first 6 months of life. {#ciBWstrat}
+
+---
+output:
+  pdf_document:
+    keep_tex: yes
+fontfamily: mathpazo
+fontsize: 9pt
+---
+
+\raggedright
+
+
+
+
+```{r setup1, include=FALSE}
+source(paste0(here::here(), "/0-config.R"))
+library(knitr)
+library(kableExtra)
+#library(DT)
+knitr::opts_chunk$set(echo = TRUE)
+
+
+load(paste0(fig_dir,"underweight/figure-data/Uwt_u6_strat_tabs.Rdata"))
+
+```
+
+This page contains tables of birthweight and gestational age status among children wasted or underweight in the first 6 months of life. Note this includes children who were born wasted or underweight.
+
+## Overall tabulation of birthweight and gestational age status 
+
+These tables include all children (including children not wasted or underweight in the first 6 months)
+
+### Birthweight - all cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall$overall$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - all monthly measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall_monthly$overall$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - African cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall$africa$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - African monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall_monthly$africa$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - South Asian cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall$asia$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - South Asian monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall_monthly$asia$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+
+### Gestational age - all cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall$overall$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - all monthly measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall_monthly$overall$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - African cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall$africa$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - African monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall_monthly$africa$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - South Asian cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall$asia$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - South Asian monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+overall_monthly$asia$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+
+
+## Tabulation of birthweight and gestational age status among children wasted in the first 6 months of life
+
+These tables include only children with any wasting measurement (WLZ < -2) in the first 6 months of life.
+
+### Birthweight - all cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting$overall$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - all monthly measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting_monthly$overall$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - African cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting$africa$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - African monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting_monthly$africa$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - South Asian cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting$asia$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - South Asian monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting_monthly$asia$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+
+### Gestational age - all cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting$overall$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - all monthly measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting_monthly$overall$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - African cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting$africa$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - African monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting_monthly$africa$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - South Asian cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting$asia$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - South Asian monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+wasting_monthly$asia$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+
+
+
+
+
+
+
+
+## Tabulation of birthweight and gestational age status among children underweight in the first 6 months of life
+
+These tables include only children with any underweight measurement (WAZ < -2) in the first 6 months of life.
+
+### Birthweight - all cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight$overall$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - all monthly measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight_monthly$overall$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - African cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight$africa$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - African monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight_monthly$africa$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - South Asian cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight$asia$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Birthweight - South Asian monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight_monthly$asia$tab_birthwt %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+
+### Gestational age - all cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight$overall$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - all monthly measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight_monthly$overall$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - African cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight$africa$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - African monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight_monthly$africa$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - South Asian cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight$asia$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+### Gestational age - South Asian monthly-measured cohorts
+
+```{r, echo=F, warning=F, message=F}
+underweight_monthly$asia$tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 14)
+```
+
+
+
+
+

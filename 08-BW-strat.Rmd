@@ -16,6 +16,7 @@ fontsize: 9pt
 ```{r setup1, include=FALSE}
 source(paste0(here::here(), "/0-config.R"))
 library(knitr)
+library(kableExtra)
 #library(DT)
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -30,15 +31,26 @@ load(paste0(fig_dir,"underweight/figure-data/BW_strat_tabs.Rdata"))
 Note that gestational age was only measured in four small cohorts with monthly measurements, two from sub-Saharan Africa and two from India. The Indian cohorts in particular include a little over 200 children each. Some estimates are grouped by region, but note the data is not sufficient in number of children or diversity of populations to make regional extrapolations, especially for the rare categories like born preterm with normal birthweight (>2500g). The gestational age data is also not based on ultrasound data, so is measured imprecisely based on last menstrual recall or the Dubowitz method (newborn exam).
 
 ```{r, echo=F, warning=F, message=F}
-knitr::kable(tab_birthweight)
+# knitr::kable(tab_birthweight)
+
+tab_birthweight %>%
+  kable("html") %>%
+  kable_styling(font_size = 10)
 ```
 
 ```{r, echo=F, warning=F, message=F}
-knitr::kable(tab_gagebrth)
+#knitr::kable(tab_gagebrth)
+tab_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 10)
+
 ```
 
 ```{r, echo=F, warning=F, message=F}
-knitr::kable(tab_birthwt_gagebrth)
+#knitr::kable(tab_birthwt_gagebrth)
+tab_birthwt_gagebrth %>%
+  kable("html") %>%
+  kable_styling(font_size = 10)
 ```
 
 
