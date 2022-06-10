@@ -1,7 +1,7 @@
 --- 
 title: "Supplement to Longitudinal analysis of child wasting and concurrence with stunting in low-resource settings"
 author: "Andrew Mertens et al."
-date: "2022-02-10"
+date: "2022-06-10"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book

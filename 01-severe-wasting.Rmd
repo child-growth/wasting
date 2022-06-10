@@ -1,0 +1,50 @@
+# Prevalence and incidence of severe growth failure {#severe}
+
+---
+output:
+  pdf_document:
+    keep_tex: yes
+fontfamily: mathpazo
+fontsize: 9pt
+---
+
+\raggedright
+
+## Overview
+
+
+This page presents age-specific prevalence and incidence results for severe wasting (weight-for-length Z-score < -3) and severe underweight (weight-for-age Z-score < -3) in the KI cohorts.
+
+```{r setup1, include=FALSE}
+source(paste0(here::here(), "/0-config.R"))
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+## Age-specific prevalence of severe wasting
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"wasting/fig-wast-3-prev-overall_region--allage-primary.png"))
+
+```
+
+## Age-specific cumulative incidence of severe wasting
+
+### Random effects
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"wasting/fig-severe-wast-CI.png"))
+
+```
+
+
+
+## Age-specific prevalence of severe underweight
+
+```{r, echo = FALSE}
+include_graphics(paste0(fig_dir,"underweight/fig-underweight-3-prev-overall_region--allage-primary.png"))
+
+```
