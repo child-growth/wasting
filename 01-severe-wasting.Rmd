@@ -34,7 +34,6 @@ include_graphics(paste0(fig_dir,"wasting/fig-wast-3-prev-overall_region--allage-
 
 ## Age-specific cumulative incidence of severe wasting
 
-### Random effects
 ```{r, echo = FALSE}
 include_graphics(paste0(fig_dir,"wasting/fig-severe-wast-CI.png"))
 

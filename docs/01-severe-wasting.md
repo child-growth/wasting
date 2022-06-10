@@ -27,7 +27,6 @@ This page presents age-specific prevalence and incidence results for severe wast
 
 ## Age-specific cumulative incidence of severe wasting
 
-### Random effects
 <img src="figures/wasting/fig-severe-wast-CI.png" width="2100" />
 
 
