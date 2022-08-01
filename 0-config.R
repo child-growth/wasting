@@ -5,8 +5,8 @@
 # source base functions
 # load libraries
 #-------------------------------------
-kiPath <- c("/data/KI/R/x86_64-pc-linux-gnu-library/4.0/" , .libPaths())
-.libPaths(kiPath)
+# kiPath <- c("/data/KI/R/x86_64-pc-linux-gnu-library/4.0/" , .libPaths())
+# .libPaths(kiPath)
 
 library(tidyverse)
 library(here)
@@ -20,7 +20,7 @@ library(data.table)
 library(viridis)
 library(ggthemes)
 library(maps)
-library(FField)
+#library(FField)
 library(ggridges)
 library(ggridges)
 library(RColorBrewer)
@@ -45,7 +45,6 @@ library(foreach)
 library(doParallel)
 library(survey)
 # install.packages("bit64")
-library(bit64)
 library(zoo)
 library(fs)
 
