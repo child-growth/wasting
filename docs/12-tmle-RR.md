@@ -17,7 +17,7 @@ fontsize: 9pt
 
 
 
-#### Risk of growth faltering at older ages by type of growth faltering at earlier ages 
+## Risk of growth faltering at older ages by type of growth faltering at earlier ages 
 
 <img src="figures//wasting/fig-tmle-RR.png" width="1200" />
 
